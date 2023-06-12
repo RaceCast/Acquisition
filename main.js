@@ -6,37 +6,36 @@ let interval = null;
 
 // Init socket.io
 const socket = io(`https://rallye.minarox.fr?key=${process.env.AUTH_KEY}`, {
-    reconnectionDelay: 300,
-    reconnectionDelayMax: 300,
-    timeout: 300,
+    reconnectionDelay: 2000,
+    reconnectionDelayMax: 2000,
+    timeout: 2000,
     retries: Infinity,
 });
 
 socket.on("connect", () => {
+    console.log(`Connected to server (${new Date().toLocaleString()})`);
     connected = true;
 
     // Send timestamp to server
     interval = setInterval(() => {
-        socket.volatile.emit("latency", Date.now());
+        if (connected) socket.volatile.emit("latency", Date.now());
     }, 500);
 });
 
 socket.on("disconnect", () => {
+    console.log(`Disconected from server (${new Date().toLocaleString()})`);
     connected = false;
     clearInterval(interval);
 });
 
 function runSensor() {
     // Exécution du script
-    const sensor = spawn('node', ['sensor.js'], { stdio: 'pipe' });
+    const sensor = spawn('node', ['scripts/sensor.js'], { stdio: 'pipe' });
 
     // Capturer la sortie du script
     sensor.stdout.on('data', (data) => {
         const values = JSON.parse(data.toString());
-        if (connected) {
-            socket.volatile.emit('mpu6050', values);
-        }
-        // console.log(values);
+        if (connected) socket.volatile.emit('mpu6050', values);
     });
 
     // Gestion de la fin du processus
@@ -49,15 +48,12 @@ function runSensor() {
 
 function runRouter() {
     // Exécution du script
-    const router = spawn('node', ['router.js'], { stdio: 'pipe' });
+    const router = spawn('node', ['scripts/gps.js'], { stdio: 'pipe' });
 
     // Capturer la sortie du script
     router.stdout.on('data', (data) => {
         const values = JSON.parse(data.toString());
-        if (connected) {
-            socket.volatile.emit('gps', values);
-        }
-        // console.log(values);
+        if (connected) socket.volatile.emit('gps', values);
     });
 
     // Gestion de la fin du processus
