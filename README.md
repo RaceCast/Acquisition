@@ -61,8 +61,6 @@ NodeJS scripts for acquiring and transmitting data from the various sensors moun
   - [Socket.io](https://socket.io/)
   - [i2c-bus](https://www.npmjs.com/package/i2c-bus)
   - [i2c-mpu6050](https://www.npmjs.com/package/i2c-mpu6050)
-  - [serialport](https://www.npmjs.com/package/serialport)
-  - [@serialport/parser-readline](https://www.npmjs.com/package/@serialport/parser-readline)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
