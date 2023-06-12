@@ -15,7 +15,11 @@
   },
   "dependencies": {
     "dotenv": "^16.1.4",
-    "socket.io-client": "^4.6.2"
+    "socket.io-client": "^4.6.2",
+    "i2c-bus": "^5.2.2",
+    "i2c-mpu6050": "^2.3.0",
+    "serialport": "^11.0.0",
+    "@serialport/parser-readline": "^11.0.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.22",
