@@ -28,7 +28,7 @@ socket.on("disconnect", () => {
 
 function runSensor() {
     // Exécution du script
-    const sensor = spawn('node', ['sensor.js'], { stdio: 'pipe' });
+    const sensor = spawn('node', ['scripts/sensor.js'], { stdio: 'pipe' });
 
     // Capturer la sortie du script
     sensor.stdout.on('data', (data) => {
@@ -49,7 +49,7 @@ function runSensor() {
 
 function runRouter() {
     // Exécution du script
-    const router = spawn('node', ['router.js'], { stdio: 'pipe' });
+    const router = spawn('node', ['scripts/router.js'], { stdio: 'pipe' });
 
     // Capturer la sortie du script
     router.stdout.on('data', (data) => {
