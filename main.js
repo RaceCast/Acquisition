@@ -17,7 +17,7 @@ socket.on("connect", () => {
 
     // Send timestamp to server
     interval = setInterval(() => {
-        socket.volatile.emit("latency", Date.now());
+        if (connected) socket.volatile.emit("latency", Date.now());
     }, 500);
 });
 
@@ -33,10 +33,7 @@ function runSensor() {
     // Capturer la sortie du script
     sensor.stdout.on('data', (data) => {
         const values = JSON.parse(data.toString());
-        if (connected) {
-            socket.volatile.emit('mpu6050', values);
-        }
-        // console.log(values);
+        if (connected) socket.volatile.emit('mpu6050', values);
     });
 
     // Gestion de la fin du processus
