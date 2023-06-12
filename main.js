@@ -48,15 +48,12 @@ function runSensor() {
 
 function runRouter() {
     // Exécution du script
-    const router = spawn('node', ['scripts/router.js'], { stdio: 'pipe' });
+    const router = spawn('node', ['scripts/gps.js'], { stdio: 'pipe' });
 
     // Capturer la sortie du script
     router.stdout.on('data', (data) => {
         const values = JSON.parse(data.toString());
-        if (connected) {
-            socket.volatile.emit('gps', values);
-        }
-        // console.log(values);
+        if (connected) socket.volatile.emit('gps', values);
     });
 
     // Gestion de la fin du processus

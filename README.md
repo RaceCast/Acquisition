@@ -61,6 +61,7 @@ NodeJS scripts for acquiring and transmitting data from the various sensors moun
   - [Socket.io](https://socket.io/)
   - [i2c-bus](https://www.npmjs.com/package/i2c-bus)
   - [i2c-mpu6050](https://www.npmjs.com/package/i2c-mpu6050)
+- [socat](http://www.dest-unreach.org/socat/)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -73,6 +74,12 @@ NodeJS scripts for acquiring and transmitting data from the various sensors moun
 ```bash
   curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
   sudo apt-get install -y nodejs
+```
+
+- Install [socat](http://www.dest-unreach.org/socat/)
+
+```bash
+  sudo apt-get install socat
 ```
 
 - Create a `.env` file at the root of the project to set embedded system authentication key for the [API](https://github.com/RaceCast/API)
