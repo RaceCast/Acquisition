@@ -1,2 +1,2 @@
 # Acquisition
-Go program for on-board system data acquisition.
+Node scripts for on-board system data acquisition.
