@@ -6,9 +6,9 @@ let interval = null;
 
 // Init socket.io
 const socket = io(`https://rallye.minarox.fr?key=${process.env.AUTH_KEY}`, {
-    reconnectionDelay: 300,
-    reconnectionDelayMax: 300,
-    timeout: 300,
+    reconnectionDelay: 2000,
+    reconnectionDelayMax: 2000,
+    timeout: 2000,
     retries: Infinity,
 });
 
