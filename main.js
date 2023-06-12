@@ -13,6 +13,7 @@ const socket = io(`https://rallye.minarox.fr?key=${process.env.AUTH_KEY}`, {
 });
 
 socket.on("connect", () => {
+    console.log(`Connected to server (${new Date().toLocaleString()})`);
     connected = true;
 
     // Send timestamp to server
@@ -22,6 +23,7 @@ socket.on("connect", () => {
 });
 
 socket.on("disconnect", () => {
+    console.log(`Disconected from server (${new Date().toLocaleString()})`);
     connected = false;
     clearInterval(interval);
 });
