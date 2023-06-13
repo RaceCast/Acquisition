@@ -18,7 +18,7 @@ let sumOffsets = {
 let currentIteration = 0;
 
 // Effectuer la calibration
-const calibrate = () => {
+function calibrate() {
     const data = sensor.readSync();
     sumOffsets.accel.x += data.accel.x;
     sumOffsets.accel.y += data.accel.y;
@@ -39,11 +39,11 @@ const calibrate = () => {
         clearInterval(calibrationInterval);
         finishCalibration();
     }
-};
+}
 
 // Fonction pour calculer les offsets moyens
-const calculateOffsets = () => {
-    const offsets = {
+function calculateOffsets() {
+    return {
         accel: {
             x: sumOffsets.accel.x / calibrationIterations,
             y: sumOffsets.accel.y / calibrationIterations,
@@ -59,28 +59,26 @@ const calculateOffsets = () => {
             y: sumOffsets.rotation.y / calibrationIterations
         }
     };
-
-    return offsets;
-};
+}
 
 // Afficher les offsets définitifs
-const displayOffsets = (offsets) => {
+function displayOffsets(offsets) {
     // Remove gravitational acceleration from z-axis accelerometer value
     offsets.accel.z -= 1;
 
     console.clear();
     console.log('Offsets:', offsets);
-};
+}
 
 // Fonction pour terminer la calibration
-const finishCalibration = () => {
+function finishCalibration() {
     // Calculer et afficher les offsets définitifs
     const offsets = calculateOffsets();
     displayOffsets(offsets);
 
     // Terminer le programme
     process.exit();
-};
+}
 
 // Lancer la calibration
 const calibrationInterval = setInterval(calibrate, 100);
