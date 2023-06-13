@@ -7,21 +7,27 @@ function toggle(boolean) {
     spawn('echo', [parseInt(boolean), '>', usbPath]);
 }
 
+function done() {
+    setTimeout(() => {
+        console.log('done');
+    }, 1500);
+}
+
 switch (command) {
     // TODO: USB Status
     case 'on':
         toggle(true);
-        console.log('done');
+        done();
         break;
     case 'off':
         toggle(false);
-        console.log('done');
+        done();
         break;
     case 'restart':
         toggle(false);
         setTimeout(() => {
             toggle(true);
-            console.log('done');
+            done();
         }, 1000);
         break;
     default:
