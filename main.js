@@ -1,6 +1,8 @@
 require("dotenv").config({ path: `${__dirname}/.env` });
+
 const { execFile, spawn } = require('node:child_process');
 const io = require('socket.io-client');
+
 let connected = false;
 let interval = null;
 
@@ -64,5 +66,24 @@ function runRouter() {
     });
 }
 
+function runStream() {
+    // Exécution du script
+    const stream = spawn('node', ['scripts/stream.js'], { stdio: 'pipe' });
+
+    // Capturer la sortie du script
+    stream.stdout.on('data', (data) => {
+        console.log(data.toString().trim());
+        // if (connected) socket.emit('stream', data);
+    });
+
+    // Gestion de la fin du processus
+    stream.on('exit', () => {
+        setTimeout(() => {
+            runStream();
+        }, 1000);
+    });
+}
+
 runSensor();
 runRouter();
+runStream();
