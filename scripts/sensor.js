@@ -9,7 +9,7 @@ const i2c1 = i2c.openSync(1);
 const sensor = new MPU6050(i2c1, address);
 
 // Limit all values to 2 decimals
-const limitDecimals = (obj) => {
+function limitDecimals (obj) {
     for (const key in obj) {
         if (typeof obj[key] === "object") limitDecimals(obj[key]);
         else obj[key] = parseFloat(obj[key].toFixed(2));
@@ -17,7 +17,7 @@ const limitDecimals = (obj) => {
 }
 
 // Read sensor data
-const readData = () => {
+function readData() {
     // Read sensor data
     const data = sensor.readSync();
 
@@ -33,6 +33,6 @@ const readData = () => {
     // Show data
     limitDecimals(data);
     console.log(JSON.stringify(data));
-};
+}
 
 setInterval(readData, 80);

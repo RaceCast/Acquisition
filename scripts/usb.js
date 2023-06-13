@@ -12,7 +12,7 @@ function toggle(boolean) {
 function done() {
     setTimeout(() => {
         console.log('done');
-    }, 8000);
+    }, 10000);
 }
 
 switch (command) {

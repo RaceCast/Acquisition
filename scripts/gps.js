@@ -1,6 +1,8 @@
 const { spawn } = require('child_process');
+
 let busy = false;
 let interval = null;
+
 function sendATCommand(command) {
     if (!busy) {
         busy = true;
@@ -48,7 +50,7 @@ function sendATCommand(command) {
     }
 }
 
-const start = () => {
+function start() {
     sendATCommand('AT+QGPSEND').then(() => {
         sendATCommand('AT+QGPS=1').then(() => {
             sendATCommand('AT+QGPSCFG="nmeasrc",1').then(() => {
@@ -61,6 +63,6 @@ const start = () => {
             });
         });
     });
-};
+}
 
 start();
