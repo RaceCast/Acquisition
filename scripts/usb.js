@@ -15,7 +15,20 @@ function done() {
 }
 
 switch (command) {
-    // TODO: USB Status
+    case 'status':
+        prevent = true;
+        const lsusb = spawn('lsusb', ['|', 'grep', 'Elgato']);
+        let data = '';
+
+        lsusb.stdout.on('data', (output) => {
+            data += output.toString();
+        });
+
+        lsusb.on('close', () => {
+            if (data.trim()) console.log('connected');
+            else console.log('disconnected');
+        });
+        break;
     case 'on':
         toggle(true);
         break;
@@ -31,7 +44,7 @@ switch (command) {
         }, 1000);
         break;
     default:
-        console.log('Invalid command. Usage: node usb.js [on|off|restart]');
+        console.log('Invalid command. Usage: node usb.js [status|on|off|restart]');
         break;
 }
 
