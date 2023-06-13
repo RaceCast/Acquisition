@@ -36,7 +36,7 @@ function runSensor() {
 
     // Capturer la sortie du script
     sensor.stdout.on('data', (data) => {
-        const values = JSON.parse(data.toString());
+        const values = JSON.parse(data.toString().trim());
         if (connected) socket.volatile.emit('mpu6050', values);
     });
 
@@ -54,7 +54,7 @@ function runRouter() {
 
     // Capturer la sortie du script
     router.stdout.on('data', (data) => {
-        const values = JSON.parse(data.toString());
+        const values = JSON.parse(data.toString().trim());
         if (connected) socket.volatile.emit('gps', values);
     });
 
