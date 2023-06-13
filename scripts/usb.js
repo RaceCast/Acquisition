@@ -1,23 +1,24 @@
 const { spawn } = require('child_process');
-// Fetch Elgato usb device id with command: lsusb | grep 'Elgato'
-const usbPath = `/sys/bus/usb/devices/8-1/authorized`;
+const fs = require('fs');
+
+const usbPath = `/sys/bus/usb/devices/6-1/authorized`;
 const command = process.argv[2];
 let prevent = false;
 
 function toggle(boolean) {
-    spawn('echo', [parseInt(boolean), '>', usbPath]);
+    fs.writeFile(usbPath, Number(boolean).toString(), () => {});
 }
 
 function done() {
     setTimeout(() => {
         console.log('done');
-    }, 1500);
+    }, 8000);
 }
 
 switch (command) {
     case 'status':
         prevent = true;
-        const lsusb = spawn('lsusb', ['|', 'grep', 'Elgato']);
+        const lsusb = spawn('lsusb');
         let data = '';
 
         lsusb.stdout.on('data', (output) => {
@@ -25,7 +26,7 @@ switch (command) {
         });
 
         lsusb.on('close', () => {
-            if (data.trim()) console.log('connected');
+            if (data.trim().includes('Elgato')) console.log('connected');
             else console.log('disconnected');
         });
         break;
@@ -44,6 +45,7 @@ switch (command) {
         }, 1000);
         break;
     default:
+        prevent = true;
         console.log('Invalid command. Usage: node usb.js [status|on|off|restart]');
         break;
 }
