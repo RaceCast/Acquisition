@@ -25,7 +25,7 @@ socket.on("connect", () => {
 });
 
 socket.on("disconnect", () => {
-    console.log(`Disconected from server (${new Date().toLocaleString()})`);
+    console.log(`Disconnected from server (${new Date().toLocaleString()})`);
     connected = false;
     clearInterval(interval);
 });
@@ -72,7 +72,7 @@ function runStream() {
 
     // Capturer la sortie du script
     stream.stdout.on('data', (data) => {
-        console.log(data.toString().trim());
+        console.log(`Stream - ${data.toString().trim()}`);
         // if (connected) socket.emit('stream', data);
     });
 
