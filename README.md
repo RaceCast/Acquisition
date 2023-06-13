@@ -33,9 +33,8 @@
       <a href="#getting-started">Getting Started</a>
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#start-development-server">Start development server</a></li>
-        <li><a href="#serve-user-interface">Serve user interface</a></li>
-        <li><a href="#deploy">Deploy</a></li>
+        <li><a href="#test-scripts">Test scripts</a></li>
+        <li><a href="#deploy-on-embedded-system">Deploy on embedded system</a></li>
       </ul>
     </li>
     <li><a href="#author">Author</a></li>
@@ -82,37 +81,35 @@ NodeJS scripts for acquiring and transmitting data from the various sensors moun
   sudo apt-get install socat
 ```
 
-- Create a `.env` file at the root of the project to set embedded system authentication key for the [API](https://github.com/RaceCast/API)
-
-````env
-  AUTH_KEY="your-auth-key"
-````
-
-### Tests scripts
-
 - Install dependencies
 
 ````bash
   npm install
 ````
 
-- Start node development server
+- Create a `.env` file at the root of the project to set embedded system authentication key for the [API](https://github.com/RaceCast/API)
+
+````env
+  AUTH_KEY="your-auth-key"
+````
+
+### Test scripts
+
+- Start individual scripts (sudo is required)
 
 ````bash
-  nodemon main.js
-  # or
-  nodemon scripts/file.js # Replace file.js by the script you want to test
+  sudo node scripts/file.js # Replace file.js by the script you want to test
 ````
 
 ### Deploy on embedded system
 
-- Start main script
+- Start main script (sudo is required)
 
 ````bash
-  node main.js
+  sudo node main.js
 ````
 
-The script will automatically fetch and send data from the sensors to the API.
+The script will automatically fetch and send data from the sensors to the [API](https://github.com/RaceCast/API).
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
