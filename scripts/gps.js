@@ -52,13 +52,15 @@ function sendATCommand(command) {
 
 function start() {
     sendATCommand('AT+QGPSEND').then(() => {
-        sendATCommand('AT+QGPS=1').then(() => {
-            sendATCommand('AT+QGPSCFG="nmeasrc",1').then(() => {
-                sendATCommand('AT+QGPSGNMEA="GGA",1').then(() => {
-                    sendATCommand('AT+QGPSLOC=1');
-                    interval = setInterval(() => {
+        sendATCommand("AT+COPS=2").then(() => {
+            sendATCommand('AT+QGPS=1').then(() => {
+                sendATCommand('AT+QGPSCFG="nmeasrc",1').then(() => {
+                    sendATCommand('AT+QGPSGNMEA="GGA",1').then(() => {
                         sendATCommand('AT+QGPSLOC=1');
-                    }, 1000);
+                        interval = setInterval(() => {
+                            sendATCommand('AT+QGPSLOC=1');
+                        }, 1000);
+                    });
                 });
             });
         });
