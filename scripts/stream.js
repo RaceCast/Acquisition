@@ -40,9 +40,9 @@ function startFFmpeg() {
     });
 
     ffmpeg.on('close', () => {
+        console.log('offline');
         counter = 0;
         online = false;
-        console.log('offline');
         setTimeout(() => {
             start();
         }, 1000);

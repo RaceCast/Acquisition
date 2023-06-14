@@ -1,6 +1,6 @@
 require("dotenv").config({ path: `${__dirname}/.env` });
 
-const { execFile, spawn } = require('node:child_process');
+const { spawn } = require('node:child_process');
 const io = require('socket.io-client');
 
 let connected = false;
@@ -73,7 +73,7 @@ function runStream() {
     // Capturer la sortie du script
     stream.stdout.on('data', (data) => {
         console.log(`Stream - ${data.toString().trim()}`);
-        // if (connected) socket.emit('stream', data);
+        // Create WebRTC connection
     });
 
     // Gestion de la fin du processus
