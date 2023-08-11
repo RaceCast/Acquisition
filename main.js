@@ -4,6 +4,7 @@ const { spawn } = require('node:child_process');
 const io = require('socket.io-client');
 
 let connected = false;
+let firefox = false;
 let interval = null;
 
 // Init socket.io
@@ -17,6 +18,11 @@ const socket = io(`https://rallye.minarox.fr?key=${process.env.AUTH_KEY}`, {
 socket.on("connect", () => {
     console.log(`Connected to server (${new Date().toLocaleString()})`);
     connected = true;
+
+    if (!firefox) {
+        firefox = true;
+        spawn('node', ['scripts/webrtc.js', 'restart']);
+    }
 
     // Send timestamp to server
     interval = setInterval(() => {
@@ -66,7 +72,7 @@ function runRouter() {
     });
 }
 
-function runStream() {
+/*function runStream() {
     // Exécution du script
     const stream = spawn('node', ['scripts/stream.js'], { stdio: 'pipe' });
 
@@ -82,8 +88,8 @@ function runStream() {
             runStream();
         }, 1000);
     });
-}
+}*/
 
 runSensor();
 runRouter();
-runStream();
+// runStream();
