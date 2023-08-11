@@ -7,7 +7,7 @@ function sendATCommand(command) {
     return new Promise((resolve) => {
         if (busy) return resolve(false);
         busy = true;
-        const socat = spawn('socat', ['- /dev/ttyUSB2'], {shell: true});
+        const socat = spawn('socat', ['- /dev/ttyUSB2'], {shell: false});
         let data = '';
 
         socat.stdout.on('data', (output) => {
@@ -42,6 +42,7 @@ function sendATCommand(command) {
             }
 
             busy = false;
+            socat.kill(0);
             return resolve(data);
         });
 
