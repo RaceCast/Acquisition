@@ -18,3 +18,7 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Javascript files
+main.js
+scripts/*.js
