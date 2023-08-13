@@ -2,11 +2,11 @@
 <br />
 
 <div align="center">
-<a href="https://github.com/RaceCar/Acquisition">
+<a href="https://github.com/RaceCar/Embedded-End">
     <img src="https://avatars.githubusercontent.com/u/134273283?s=80" alt="Logo" width="auto" height="80" style="border-radius: 8px">
 </a>
 
-<h3 align="center">Acquisition</h3>
+<h3 align="center">Embedded-End</h3>
 
 ![Project Version](https://img.shields.io/github/package-json/v/RaceCast/Acquisition?label=Version)&nbsp;
 ![Project License](https://img.shields.io/github/license/RaceCast/Acquisition?label=Licence)
@@ -49,18 +49,19 @@ NodeJS scripts for acquiring and transmitting data from the various sensors moun
 
 - Collects and processes data from the MPU6050 sensor
 - Collects and processes data from the GPS sensor
-- Send data from the embedded system to the [API](https://github.com/RaceCast/API):
+- Send data from the embedded system to the [Back-End](https://github.com/RaceCast/Back-End):
     - MPU6050 data (accelerometer, gyroscope, rotation, temperature)
     - GPS data (latitude, longitude, altitude, speed)
     - Latency value between the embedded system and the API
 
 ### Tech Stack
 
-- [NodeJS](https://nodejs.org/)
-  - [Socket.io](https://socket.io/)
-  - [i2c-bus](https://www.npmjs.com/package/i2c-bus)
-  - [i2c-mpu6050](https://www.npmjs.com/package/i2c-mpu6050)
+- [Node.js](https://nodejs.org/)
+    - [Socket.io](https://socket.io/)
+    - [i2c-bus](https://www.npmjs.com/package/i2c-bus)
+    - [i2c-mpu6050](https://www.npmjs.com/package/i2c-mpu6050)
 - [socat](http://www.dest-unreach.org/socat/)
+- [TypeScript](https://www.typescriptlang.org/)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -68,7 +69,7 @@ NodeJS scripts for acquiring and transmitting data from the various sensors moun
 
 ### Prerequisites
 
-- Install [NodeJS](https://nodejs.org/) with [npm](https://www.npmjs.com/)
+- Install [Node.js](https://nodejs.org/) with [npm](https://www.npmjs.com/)
 
 ```bash
   curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
@@ -81,16 +82,29 @@ NodeJS scripts for acquiring and transmitting data from the various sensors moun
   sudo apt-get install socat
 ```
 
+- Create a `.env` file at the root of the project to set embedded system authentication key for
+  the [Back-End](https://github.com/RaceCast/Back-End)
+
+````env
+  AUTH_KEY="your-auth-key"
+````
+
 - Install dependencies
 
 ````bash
   npm install
 ````
 
-- Create a `.env` file at the root of the project to set embedded system authentication key for the [API](https://github.com/RaceCast/API)
+- Lint and fix files
 
-````env
-  AUTH_KEY="your-auth-key"
+````bash
+  npm run lint
+````
+
+- Compile TypeScript files
+
+````bash
+  npm run compile
 ````
 
 ### Test scripts
@@ -98,7 +112,7 @@ NodeJS scripts for acquiring and transmitting data from the various sensors moun
 - Start individual scripts (sudo is required)
 
 ````bash
-  sudo node scripts/file.js # Replace file.js by the script you want to test
+  node scripts/file.js # Replace file.js by the script you want to test
 ````
 
 ### Deploy on embedded system
@@ -106,10 +120,13 @@ NodeJS scripts for acquiring and transmitting data from the various sensors moun
 - Start main script (sudo is required)
 
 ````bash
-  sudo node main.js
+  npm run start
+  # or
+  node main.js
 ````
 
-The script will automatically fetch and send data from the sensors to the [API](https://github.com/RaceCast/API).
+The script will automatically fetch and send data from the sensors to
+the [Back-End](https://github.com/RaceCast/Back-End).
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
