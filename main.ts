@@ -27,6 +27,7 @@ interface State {
   online: boolean;
   mpu6050: boolean;
   gps: boolean;
+  webrtc: boolean;
 }
 
 interface Mpu6050 {
@@ -55,11 +56,11 @@ interface Gps {
 }
 
 // Define global variables
-// let firefox: boolean = false;
 const state: State = {
   online: false,
   mpu6050: false,
   gps: false,
+  webrtc: false,
 };
 
 // --- Interface and events ---
@@ -67,7 +68,7 @@ const state: State = {
 function updateConsoleStatus(erase: boolean = true): void {
   if (process.stdout.isTTY) {
     if (erase) {
-      for (let i: number = 0; i <= 3; i++) {
+      for (let i: number = 0; i <= 4; i++) {
         const y: number | null = i === 0 ? null : -1;
         process.stdout.moveCursor(0, y);
         process.stdout.clearLine(1);
@@ -95,6 +96,13 @@ function updateConsoleStatus(erase: boolean = true): void {
           : `\x1b[31mOffline\x1b[89m\x1b[0m`
       }\r\n`,
     );
+    process.stdout.write(
+      `WebRTC: ${
+        state.webrtc
+          ? `\x1b[32mOnline\x1b[89m\x1b[0m`
+          : `\x1b[31mOffline\x1b[89m\x1b[0m`
+      }\r\n`,
+    );
   }
 }
 
@@ -110,6 +118,9 @@ socket.on("connect", (): void => {
   setTimeout((): void => {
     if (!state.gps) runGps();
   }, 600);
+  setTimeout((): void => {
+    if (!state.webrtc) runWebrtc();
+  }, 900);
 
   socket.on("disconnect", (): void => {
     state.online = false;
@@ -121,11 +132,6 @@ socket.on("connect", (): void => {
   });
 
   socket.emit("state", state);
-
-  // if (!firefox) {
-  //    firefox = true;
-  //   spawn("node", ["scripts/webrtc.js", "restart"]);
-  // }
 });
 
 // Script execution
@@ -193,22 +199,26 @@ function runGps(): void {
   });
 }
 
-/*function runStream() {
-    // Exécution du script
-    const stream = spawn('node', ['scripts/stream.js'], { stdio: 'pipe' });
+function runWebrtc(): void {
+  // Run the script
+  const process: ChildProcessWithoutNullStreams = spawn("node", [
+    "scripts/webrtc.js",
+    "restart",
+  ]);
 
-    // Capturer la sortie du script
-    stream.stdout.on('data', (data) => {
-        console.log(`Stream - ${data.toString().trim()}`);
-        // Create WebRTC connection
-    });
+  process.on("spawn", (): void => {
+    state.webrtc = true;
+    updateConsoleStatus();
+    socket.volatile.emit("state", state);
+  });
 
-    // Gestion de la fin du processus
-    stream.on('exit', () => {
-        setTimeout(() => {
-            runStream();
-        }, 1000);
+  ["exit", "error"].forEach((type: string): void => {
+    process.on(type, (): void => {
+      state.webrtc = false;
+      updateConsoleStatus();
+      socket.volatile.emit("state", state);
     });
-}*/
+  });
+}
 
 updateConsoleStatus(false);
