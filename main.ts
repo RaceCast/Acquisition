@@ -106,17 +106,16 @@ socket.on("connect", () => {
 
 // Script execution
 function runMpu6050(): void {
+  // Run the script
   const sensor = spawn("node", ["scripts/mpu6050.js"], { stdio: "pipe" });
-
-  // Update status when the script is ready
-  sensor.on("spawn", () => {
-    state.mpu6050 = true;
-    updateConsoleStatus();
-    socket.volatile.emit("state", state);
-  });
 
   // Send data to the backend
   sensor.stdout.on("data", (data: string) => {
+    if (!state.mpu6050) {
+      state.mpu6050 = true;
+      updateConsoleStatus();
+      socket.volatile.emit("state", state);
+    }
     const values: Mpu6050 = JSON.parse(data.toString().trim());
     if (state.online) socket.volatile.emit("mpu6050", values);
   });
