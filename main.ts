@@ -1,6 +1,6 @@
 import { config } from "dotenv";
-import { spawn } from "node:child_process";
-import { io } from "socket.io-client";
+import { ChildProcessWithoutNullStreams, spawn } from "node:child_process";
+import { io, Socket } from "socket.io-client";
 
 config({ path: `${__dirname}/.env` });
 
@@ -12,12 +12,15 @@ if (!process.env.AUTH_KEY) {
 }
 
 // Init socket.io
-const socket = io(`https://rallye.minarox.fr?key=${process.env.AUTH_KEY}`, {
-  reconnectionDelay: 2000,
-  reconnectionDelayMax: 2000,
-  timeout: 2000,
-  retries: Infinity,
-});
+const socket: Socket = io(
+  `https://rallye.minarox.fr?key=${process.env.AUTH_KEY}`,
+  {
+    reconnectionDelay: 2000,
+    reconnectionDelayMax: 2000,
+    timeout: 2000,
+    retries: Infinity,
+  },
+);
 
 // Define interfaces
 interface State {
@@ -54,8 +57,8 @@ const state: State = {
 // Update console status
 function updateConsoleStatus(erase: boolean = true): void {
   if (erase) {
-    for (let i = 0; i <= 2; i++) {
-      const y = i === 0 ? null : -1;
+    for (let i: number = 0; i <= 3; i++) {
+      const y: number | null = i === 0 ? null : -1;
       process.stdout.moveCursor(0, y);
       process.stdout.clearLine(1);
     }
@@ -78,21 +81,21 @@ function updateConsoleStatus(erase: boolean = true): void {
 }
 
 // Socket.io events
-socket.on("connect", () => {
+socket.on("connect", (): void => {
   state.online = true;
   updateConsoleStatus();
 
   // Run scripts
-  setTimeout(() => {
+  setTimeout((): void => {
     if (!state.mpu6050) runMpu6050();
   }, 300);
 
-  socket.on("disconnect", () => {
+  socket.on("disconnect", (): void => {
     state.online = false;
     updateConsoleStatus();
   });
 
-  socket.on("latency", (callback) => {
+  socket.on("latency", (callback): void => {
     callback(Date.now());
   });
 
@@ -107,10 +110,14 @@ socket.on("connect", () => {
 // Script execution
 function runMpu6050(): void {
   // Run the script
-  const sensor = spawn("node", ["scripts/mpu6050.js"], { stdio: "pipe" });
+  const sensor: ChildProcessWithoutNullStreams = spawn(
+    "node",
+    ["scripts/mpu6050.js"],
+    { stdio: "pipe" },
+  );
 
   // Send data to the backend
-  sensor.stdout.on("data", (data: string) => {
+  sensor.stdout.on("data", (data: string): void => {
     if (!state.mpu6050) {
       state.mpu6050 = true;
       updateConsoleStatus();
@@ -121,12 +128,12 @@ function runMpu6050(): void {
   });
 
   // Restart the script if it crashes or exits
-  ["exit", "error"].forEach((type: string) => {
-    sensor.on(type, () => {
+  ["exit", "error"].forEach((type: string): void => {
+    sensor.on(type, (): void => {
       state.mpu6050 = false;
       updateConsoleStatus();
       socket.volatile.emit("state", state);
-      setTimeout(() => {
+      setTimeout((): void => {
         runMpu6050();
       }, 2000);
     });

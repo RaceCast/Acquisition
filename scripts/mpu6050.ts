@@ -23,7 +23,7 @@ interface Data {
 // Define global variables
 const address: number = 0x68;
 const bus: number = i2c.openSync(1);
-const mpu6050 = new Mpu6050(bus, address);
+const mpu6050: Mpu6050 = new Mpu6050(bus, address);
 
 // Limit all values to 2 decimals
 function limitDecimals(data: Data): void {
