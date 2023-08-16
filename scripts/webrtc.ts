@@ -1,11 +1,11 @@
 import { exec } from "child_process";
 import findProcess from "find-process";
 
-const command = process.argv[2];
+const command: string = process.argv[2];
 
 const killProgram = () => {
-  return new Promise((resolve) => {
-    exec("pkill -f firefox", () => {
+  return new Promise((resolve): void => {
+    exec("pkill -f firefox", (): void => {
       setTimeout(() => {
         return resolve(true);
       }, 1000);
@@ -13,19 +13,19 @@ const killProgram = () => {
   });
 };
 
-const checkProgram = async () => {
-  return new Promise(async (resolve) => {
+const checkProgram = async (): Promise<unknown> => {
+  return new Promise(async (resolve): Promise<void> => {
     const processes = await findProcess("name", "firefox");
     return resolve(processes.length > 0);
   });
 };
 
-const launchProgram = () => {
+const launchProgram = (): void => {
   exec(
     '/bin/su -c "export DISPLAY=:0 && xdg-open https://rallye.minarox.fr/broadcast.html" - coolpi',
   );
-  setTimeout(() => {
-    checkProgram().then((running) => {
+  setTimeout((): void => {
+    checkProgram().then((running): void => {
       if (running) console.log("Firefox is running.");
       else console.log("Firefox is not running.");
     });
@@ -34,15 +34,15 @@ const launchProgram = () => {
 
 switch (command) {
   case "status":
-    checkProgram().then((running) => {
+    checkProgram().then((running): void => {
       if (running) console.log("Firefox is running.");
       else console.log("Firefox is not running.");
     });
     break;
   case "start":
-    checkProgram().then((running) => {
+    checkProgram().then((running): void => {
       if (running) {
-        killProgram().then(() => {
+        killProgram().then((): void => {
           launchProgram();
         });
       } else {
@@ -51,12 +51,12 @@ switch (command) {
     });
     break;
   case "restart":
-    killProgram().then(() => {
+    killProgram().then((): void => {
       launchProgram();
     });
     break;
   case "stop":
-    killProgram().then(() => {
+    killProgram().then((): void => {
       console.log("Firefox stopped successfully.");
     });
     break;
