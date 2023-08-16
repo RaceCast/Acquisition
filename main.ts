@@ -65,35 +65,37 @@ const state: State = {
 // --- Interface and events ---
 // Update console status
 function updateConsoleStatus(erase: boolean = true): void {
-  if (erase) {
-    for (let i: number = 0; i <= 3; i++) {
-      const y: number | null = i === 0 ? null : -1;
-      process.stdout.moveCursor(0, y);
-      process.stdout.clearLine(1);
+  if (process.stdout.isTTY) {
+    if (erase) {
+      for (let i: number = 0; i <= 3; i++) {
+        const y: number | null = i === 0 ? null : -1;
+        process.stdout.moveCursor(0, y);
+        process.stdout.clearLine(1);
+      }
+      process.stdout.cursorTo(0);
     }
-    process.stdout.cursorTo(0);
+    process.stdout.write(
+      `Back-End: ${
+        state.online
+          ? `\x1b[32mOnline\x1b[89m\x1b[0m`
+          : `\x1b[31mOffline\x1b[89m\x1b[0m`
+      }\r\n`,
+    );
+    process.stdout.write(
+      `MPU6050: ${
+        state.mpu6050
+          ? `\x1b[32mOnline\x1b[89m\x1b[0m`
+          : `\x1b[31mOffline\x1b[89m\x1b[0m`
+      }\r\n`,
+    );
+    process.stdout.write(
+      `GPS: ${
+        state.gps
+          ? `\x1b[32mOnline\x1b[89m\x1b[0m`
+          : `\x1b[31mOffline\x1b[89m\x1b[0m`
+      }\r\n`,
+    );
   }
-  process.stdout.write(
-    `Back-End: ${
-      state.online
-        ? `\x1b[32mOnline\x1b[89m\x1b[0m`
-        : `\x1b[31mOffline\x1b[89m\x1b[0m`
-    }\r\n`,
-  );
-  process.stdout.write(
-    `MPU6050: ${
-      state.mpu6050
-        ? `\x1b[32mOnline\x1b[89m\x1b[0m`
-        : `\x1b[31mOffline\x1b[89m\x1b[0m`
-    }\r\n`,
-  );
-  process.stdout.write(
-    `GPS: ${
-      state.gps
-        ? `\x1b[32mOnline\x1b[89m\x1b[0m`
-        : `\x1b[31mOffline\x1b[89m\x1b[0m`
-    }\r\n`,
-  );
 }
 
 // Socket.io events
