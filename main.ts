@@ -26,6 +26,7 @@ const socket: Socket = io(
 interface State {
   online: boolean;
   mpu6050: boolean;
+  gps: boolean;
 }
 
 interface Mpu6050 {
@@ -46,11 +47,19 @@ interface Mpu6050 {
   temp: number;
 }
 
+interface Gps {
+  latitude: number;
+  longitude: number;
+  altitude: number;
+  speed: number;
+}
+
 // Define global variables
 // let firefox: boolean = false;
 const state: State = {
   online: false,
   mpu6050: false,
+  gps: false,
 };
 
 // --- Interface and events ---
@@ -78,6 +87,13 @@ function updateConsoleStatus(erase: boolean = true): void {
         : `\x1b[31mOffline\x1b[89m\x1b[0m`
     }\r\n`,
   );
+  process.stdout.write(
+    `GPS: ${
+      state.gps
+        ? `\x1b[32mOnline\x1b[89m\x1b[0m`
+        : `\x1b[31mOffline\x1b[89m\x1b[0m`
+    }\r\n`,
+  );
 }
 
 // Socket.io events
@@ -89,6 +105,9 @@ socket.on("connect", (): void => {
   setTimeout((): void => {
     if (!state.mpu6050) runMpu6050();
   }, 300);
+  setTimeout((): void => {
+    if (!state.gps) runGps();
+  }, 600);
 
   socket.on("disconnect", (): void => {
     state.online = false;
@@ -110,26 +129,26 @@ socket.on("connect", (): void => {
 // Script execution
 function runMpu6050(): void {
   // Run the script
-  const sensor: ChildProcessWithoutNullStreams = spawn(
+  const process: ChildProcessWithoutNullStreams = spawn(
     "node",
     ["scripts/mpu6050.js"],
     { stdio: "pipe" },
   );
 
   // Send data to the backend
-  sensor.stdout.on("data", (data: string): void => {
+  process.stdout.on("data", (data: string): void => {
     if (!state.mpu6050) {
       state.mpu6050 = true;
       updateConsoleStatus();
       socket.volatile.emit("state", state);
     }
-    const values: Mpu6050 = JSON.parse(data.toString().trim());
+    const values: Mpu6050 = JSON.parse(data);
     if (state.online) socket.volatile.emit("mpu6050", values);
   });
 
   // Restart the script if it crashes or exits
   ["exit", "error"].forEach((type: string): void => {
-    sensor.on(type, (): void => {
+    process.on(type, (): void => {
       state.mpu6050 = false;
       updateConsoleStatus();
       socket.volatile.emit("state", state);
@@ -140,23 +159,37 @@ function runMpu6050(): void {
   });
 }
 
-/*function runRouter() {
-  // Exécution du script
-  const router = spawn("node", ["scripts/gps.js"], { stdio: "pipe" });
+function runGps(): void {
+  // Run the script
+  const process: ChildProcessWithoutNullStreams = spawn(
+    "node",
+    ["scripts/gps.js"],
+    { stdio: "pipe" },
+  );
 
-  // Capturer la sortie du script
-  router.stdout.on("data", (data) => {
-    const values = JSON.parse(data.toString().trim());
-    if (connected) socket.volatile.emit("gps", values);
+  // Send data to the backend
+  process.stdout.on("data", (data: string): void => {
+    if (!state.gps) {
+      state.gps = true;
+      updateConsoleStatus();
+      socket.volatile.emit("state", state);
+    }
+    const values: Gps = JSON.parse(data);
+    if (state.online) socket.volatile.emit("gps", values);
   });
 
-  // Gestion de la fin du processus
-  router.on("exit", () => {
-    setTimeout(() => {
-      runRouter();
-    }, 1000);
+  // Restart the script if it crashes or exits
+  ["exit", "error"].forEach((type: string): void => {
+    process.on(type, (): void => {
+      state.gps = false;
+      updateConsoleStatus();
+      socket.volatile.emit("state", state);
+      setTimeout((): void => {
+        runGps();
+      }, 2000);
+    });
   });
-}*/
+}
 
 /*function runStream() {
     // Exécution du script
@@ -177,7 +210,3 @@ function runMpu6050(): void {
 }*/
 
 updateConsoleStatus(false);
-
-// restartSensor();
-// runRouter();
-// runStream();
