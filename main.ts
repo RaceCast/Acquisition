@@ -93,7 +93,7 @@ function clearConsole(): void {
 
 // Update console status
 function updateConsoleStatus(erase: boolean = true): void {
-  if (process.stdout.isTTY || !processes.exit) {
+  if (process.stdout.isTTY && !processes.exit) {
     if (erase) clearConsole();
     process.stdout.write(
       `Back-End: ${
@@ -249,12 +249,12 @@ function runWebrtc(): void {
 
 // Cleanup
 function cleanup(): void {
+  if (processes.exit) return;
   processes.exit = true;
 
   // Exit message
   if (process.stdout.isTTY) {
-    clearConsole();
-    process.stdout.write("Clear processes and exiting...\r\n");
+    process.stdout.write("\r\nClear processes and exiting...\r\n");
   }
 
   // Kill processes
