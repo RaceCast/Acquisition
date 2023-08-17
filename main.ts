@@ -164,7 +164,7 @@ function runMpu6050(): void {
     if (!state.mpu6050) {
       state.mpu6050 = true;
       updateConsoleStatus();
-      socket.emit("state", state);
+      socket.volatile.emit("state", state);
     }
     const values: Mpu6050 = JSON.parse(data);
     if (state.online) socket.volatile.emit("mpu6050", values);
@@ -175,7 +175,7 @@ function runMpu6050(): void {
     processes.mpu6050.on(type, (): void => {
       state.mpu6050 = false;
       updateConsoleStatus();
-      socket.emit("state", state);
+      socket.volatile.emit("state", state);
       processes.mpu6050 = null;
       if (!processes.exit) {
         setTimeout((): void => {
@@ -196,7 +196,7 @@ function runGps(): void {
     if (!state.gps) {
       state.gps = true;
       updateConsoleStatus();
-      socket.emit("state", state);
+      socket.volatile.emit("state", state);
     }
     const values: Gps = JSON.parse(data);
     if (state.online) socket.volatile.emit("gps", values);
@@ -206,7 +206,7 @@ function runGps(): void {
     if (state.gps) {
       state.gps = false;
       updateConsoleStatus();
-      socket.emit("state", state);
+      socket.volatile.emit("state", state);
     }
   });
 
@@ -215,7 +215,7 @@ function runGps(): void {
     processes.gps.on(type, (): void => {
       state.gps = false;
       updateConsoleStatus();
-      socket.emit("state", state);
+      socket.volatile.emit("state", state);
       processes.gps = null;
       if (!processes.exit) {
         setTimeout((): void => {
@@ -234,7 +234,7 @@ function runWebrtc(): void {
   processes.webrtc.on("spawn", (): void => {
     state.webrtc = true;
     updateConsoleStatus();
-    socket.emit("state", state);
+    socket.volatile.emit("state", state);
   });
 
   ["exit", "error"].forEach((type: string): void => {
@@ -242,7 +242,7 @@ function runWebrtc(): void {
       state.webrtc = false;
       updateConsoleStatus();
       processes.webrtc = null;
-      socket.emit("state", state);
+      socket.volatile.emit("state", state);
     });
   });
 }
