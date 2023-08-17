@@ -90,6 +90,8 @@ function getPosition(): void {
               }),
             );
           }
+        } else {
+          process.stderr.write("error");
         }
       }
     },

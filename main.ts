@@ -202,6 +202,14 @@ function runGps(): void {
     if (state.online) socket.volatile.emit("gps", values);
   });
 
+  processes.gps.stderr.on("data", (): void => {
+    if (state.gps) {
+      state.gps = false;
+      updateConsoleStatus();
+      socket.emit("state", state);
+    }
+  });
+
   // Restart the script if it crashes or exits
   ["exit", "error"].forEach((type: string): void => {
     processes.gps.on(type, (): void => {
