@@ -268,11 +268,13 @@ function cleanup(): void {
     spawn("node", ["scripts/webrtc.js", "stop"]);
   }
 
-  // Disconnect socket
-  socket.disconnect();
+  setTimeout((): void => {
+    // Disconnect socket
+    socket.disconnect();
 
-  // Exit
-  process.exit();
+    // Exit
+    process.exit();
+  }, 300);
 }
 
 // Cleanup on exit
