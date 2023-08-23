@@ -11,7 +11,9 @@ config({ path: `${__dirname}/.env` });
 // --- Initialization ---
 // Check if auth key is defined
 if (!process.env.TOKEN) {
-  process.stderr.write("ERROR: No auth key defined in .env file");
+  process.stderr.write(
+    "ERROR: No No authentication token defined in .env file.",
+  );
   process.exit(1);
 }
 
