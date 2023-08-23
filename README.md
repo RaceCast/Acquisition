@@ -43,7 +43,7 @@
 
 ## About The Project
 
-NodeJS scripts for acquiring and transmitting data from the various sensors mounted on the embedded system.
+Node.js scripts for acquiring and transmitting data from the various sensors mounted on the embedded system.
 
 ### Features
 
@@ -86,7 +86,7 @@ NodeJS scripts for acquiring and transmitting data from the various sensors moun
   the [Back-End](https://github.com/RaceCast/Back-End)
 
 ````env
-  AUTH_KEY="your-auth-key"
+  TOKEN="your-auth-key"
 ````
 
 - Install dependencies
