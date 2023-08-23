@@ -24,6 +24,7 @@ interface Data {
 const address: number = 0x68;
 const bus: number = i2c.openSync(1);
 const mpu6050: Mpu6050 = new Mpu6050(bus, address);
+const temperatures: number[] = [];
 
 // Limit all values to 2 decimals
 function limitDecimals(data: Data): void {
@@ -31,6 +32,15 @@ function limitDecimals(data: Data): void {
     if (typeof data[key] === "object") limitDecimals(data[key]);
     else data[key] = parseFloat(data[key].toFixed(2));
   }
+}
+
+// Smooth temperature values
+function averageTemperature(newTemp: number): number {
+  temperatures.push(newTemp);
+  if (temperatures.length > 25) temperatures.shift();
+  const sum: number = temperatures.reduce((a: number, b: number) => a + b, 0);
+  const average: number = sum / temperatures.length;
+  return parseFloat(average.toFixed(2));
 }
 
 // Read sensor data
@@ -49,6 +59,7 @@ function readData(): void {
 
   // Show data
   limitDecimals(data);
+  data.temp = averageTemperature(data.temp);
   process.stdout.write(JSON.stringify(data));
 }
 
