@@ -22,7 +22,7 @@ const checkProgram = async (): Promise<unknown> => {
 
 const launchProgram = (): void => {
   exec(
-    '/bin/su -c "export DISPLAY=:0 && xdg-open https://rallye.minarox.fr/broadcast.html" - coolpi',
+    '/bin/su -c "export DISPLAY=:0 && xdg-open https://rallye.minarox.fr/broadcast" - coolpi',
   );
   setTimeout((): void => {
     checkProgram().then((running): void => {
