@@ -215,7 +215,7 @@ export async function startStream(): Promise<void> {
 
             await room.connect(await window.getEnvVariable('LIVEKIT_WS_URL'), token);
 
-            if (process.argv.slice(2) === "--fake") {
+            if (process.argv.slice(2)[0] === "--fake") {
                 await room.localParticipant.enableCameraAndMicrophone();
             } else {
                 await room.localParticipant.publishTrack(tracks.audio, {
@@ -251,7 +251,7 @@ export async function startStream(): Promise<void> {
             }
         }
 
-        if (process.argv.slice(2) === "--fake") {
+        if (process.argv.slice(2)[0] === "--fake") {
             setTimeout(startSession);
         } else {
             setTimeout(createTracks);
