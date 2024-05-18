@@ -214,33 +214,36 @@ export async function startStream(): Promise<void> {
                 .on(LivekitClient.RoomEvent.Disconnected, () => window.setConnected(false));
 
             await room.connect(await window.getEnvVariable('LIVEKIT_WS_URL'), token);
-            await room.localParticipant.enableCameraAndMicrophone();
 
-            /* await room.localParticipant.publishTrack(tracks.audio, {
-                name: "main-audio",
-                stream: "main",
-                source: "audio",
-                simulcast: false,
-                red: true,
-                dtx: true,
-                stopMicTrackOnMute: false,
-                audioPreset: {
-                    maxBitrate: 48_000
-                }
-            });
+            if (process.argv.slice(2) === "--fake") {
+                await room.localParticipant.enableCameraAndMicrophone();
+            } else {
+                await room.localParticipant.publishTrack(tracks.audio, {
+                    name: "main-audio",
+                    stream: "main",
+                    source: "audio",
+                    simulcast: false,
+                    red: true,
+                    dtx: true,
+                    stopMicTrackOnMute: false,
+                    audioPreset: {
+                        maxBitrate: 48_000
+                    }
+                });
 
-            await room.localParticipant.publishTrack(tracks.video, {
-                name: "main-video",
-                stream: "main",
-                source: "camera",
-                simulcast: false,
-                videoCodec: "AV1",
-                videoEncoding: {
-                    maxFramerate: 24,
-                    maxBitrate: 800_000,
-                    priority: "high"
-                }
-            }); */
+                await room.localParticipant.publishTrack(tracks.video, {
+                    name: "main-video",
+                    stream: "main",
+                    source: "camera",
+                    simulcast: false,
+                    videoCodec: "AV1",
+                    videoEncoding: {
+                        maxFramerate: 24,
+                        maxBitrate: 800_000,
+                        priority: "high"
+                    }
+                });
+            }
 
             if (!dataListener) {
                 dataListener = true;
@@ -248,8 +251,11 @@ export async function startStream(): Promise<void> {
             }
         }
 
-        // setTimeout(createTracks);
-        setTimeout(startSession);
+        if (process.argv.slice(2) === "--fake") {
+            setTimeout(startSession);
+        } else {
+            setTimeout(createTracks);
+        }
     });
 }
 
