@@ -45,6 +45,7 @@ function getEnvVariable(name: string): string | undefined {
  * @returns {string[]} Arguments
  */
 function getProcessArgs(): string[] {
+    console.log(process.argv.slice(2));
     return process.argv.slice(2);
 }
 
@@ -265,11 +266,11 @@ export async function startStream(): Promise<void> {
         console.log(await window.getProcessArgs()[0])
         console.log(await window.getProcessArgs()[0] === "--fake")
 
-        if (await window.getProcessArgs()[0] === "--fake") {
+        /* if (await window.getProcessArgs()[0] === "--fake") {
             setTimeout(startSession);
         } else {
             setTimeout(createTracks);
-        }
+        } */
     });
 }
 
@@ -290,4 +291,3 @@ process.on('message', (data: any): void => {
 });
 
 setTimeout(startStream);
-console.log(getProcessArgs());
