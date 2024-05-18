@@ -215,6 +215,8 @@ export async function startStream(): Promise<void> {
                 );
             }
 
+            console.log(window.getProcessArgs())
+
             await room.prepareConnection(await window.getEnvVariable('LIVEKIT_WS_URL'), token);
 
             room
@@ -286,3 +288,4 @@ process.on('message', (data: any): void => {
 });
 
 setTimeout(startStream);
+console.log(getProcessArgs());
