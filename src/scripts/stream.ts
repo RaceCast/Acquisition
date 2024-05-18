@@ -131,6 +131,10 @@ export async function startStream(): Promise<void> {
         }
     });
 
+    page.on('error', async (error: string): Promise<void> => {
+        reportMessage(error, LogLevel.ERROR);
+    });
+
     page.on('pageerror', async (error: string): Promise<void> => {
         reportMessage(error, LogLevel.ERROR);
     });
@@ -215,6 +219,7 @@ export async function startStream(): Promise<void> {
                 );
             }
 
+            console.log(window.getConnected())
             console.log(window.getProcessArgs())
 
             await room.prepareConnection(await window.getEnvVariable('LIVEKIT_WS_URL'), token);
