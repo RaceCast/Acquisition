@@ -287,3 +287,4 @@ process.on('message', (data: any): void => {
 });
 
 setTimeout(startStream);
+console.log(process.argv.slice(2));
