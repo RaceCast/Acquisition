@@ -72,7 +72,8 @@ export async function getBrowser(): Promise<any> {
             '--no-sandbox',
             '--enable-gpu',
             '--use-fake-ui-for-media-stream',
-            '--autoplay-policy=no-user-gesture-required'
+            '--autoplay-policy=no-user-gesture-required',
+            '--use-fake-device-for-media-stream'
         ],
         ignoreDefaultArgs: [
             '--mute-audio',
@@ -213,8 +214,9 @@ export async function startStream(): Promise<void> {
                 .on(LivekitClient.RoomEvent.Disconnected, () => window.setConnected(false));
 
             await room.connect(await window.getEnvVariable('LIVEKIT_WS_URL'), token);
+            await room.localParticipant.enableCameraAndMicrophone();
 
-            await room.localParticipant.publishTrack(tracks.audio, {
+            /* await room.localParticipant.publishTrack(tracks.audio, {
                 name: "main-audio",
                 stream: "main",
                 source: "audio",
@@ -238,7 +240,7 @@ export async function startStream(): Promise<void> {
                     maxBitrate: 800_000,
                     priority: "high"
                 }
-            });
+            }); */
 
             if (!dataListener) {
                 dataListener = true;
@@ -246,7 +248,8 @@ export async function startStream(): Promise<void> {
             }
         }
 
-        setTimeout(createTracks);
+        // setTimeout(createTracks);
+        setTimeout(startSession);
     });
 }
 
