@@ -22,7 +22,8 @@
   "scripts": {
     "dev": "ts-node index.ts",
     "build": "npx tsc; cp -r src/libs dist/src/libs; cp .env dist/.env",
-    "start": "NODE_ENV=production node dist/index.js"
+    "start": "NODE_ENV=production node dist/index.js",
+    "start-fake": "NODE_ENV=production node dist/index.js --fake"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
