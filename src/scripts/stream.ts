@@ -219,9 +219,6 @@ export async function startStream(): Promise<void> {
                 );
             }
 
-            console.log(window.getConnected())
-            console.log(window.getProcessArgs())
-
             await room.prepareConnection(await window.getEnvVariable('LIVEKIT_WS_URL'), token);
 
             room
@@ -267,6 +264,9 @@ export async function startStream(): Promise<void> {
                 window.addEventListener('data', dataEvent);
             }
         }
+
+        console.log(window.getConnected())
+        console.log(window.getProcessArgs())
 
         if (window.getProcessArgs()[0] === "--fake") {
             setTimeout(startSession);
