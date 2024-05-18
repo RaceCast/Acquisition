@@ -76,7 +76,6 @@ function launchSensor(): void {
  * @returns {void}
  */
 function launchStream(): void {
-    console.log(process.argv.slice(2));
     logMessage(`Launching Stream script...`, LogLevel.INFO);
     const fake_arg: any = process.argv.slice(2)[0] === "--fake" ? ["--fake"] : null;
     processes.stream = fork(`${__dirname}/src/scripts/stream.${fileType}`, fake_arg);
