@@ -45,7 +45,6 @@ function getEnvVariable(name: string): string | undefined {
  * @returns {string[]} Arguments
  */
 function getProcessArgs(): string[] {
-    console.log(process.argv.slice(2));
     return process.argv.slice(2);
 }
 
