@@ -74,17 +74,22 @@ export async function getBrowser(): Promise<any> {
         return browser;
     }
 
+    // Prepare args
+    const args: string[] = [
+        '--disable-setuid-sandbox',
+        '--no-sandbox',
+        '--enable-gpu',
+        '--use-fake-ui-for-media-stream',
+        '--autoplay-policy=no-user-gesture-required'
+    ]
+    if (getProcessArgs()[0] === "--fake") {
+        args.push("--use-fake-device-for-media-stream")
+    }
+
     // Launch the browser
     browser = await puppeteer.launch({
         executablePath: '/usr/bin/chromium',
-        args: [
-            '--disable-setuid-sandbox',
-            '--no-sandbox',
-            '--enable-gpu',
-            '--use-fake-ui-for-media-stream',
-            '--autoplay-policy=no-user-gesture-required',
-            '--use-fake-device-for-media-stream'
-        ],
+        args: args,
         ignoreDefaultArgs: [
             '--mute-audio',
             '--hide-scrollbars'
@@ -227,7 +232,7 @@ export async function startStream(): Promise<void> {
 
             await room.connect(await window.getEnvVariable('LIVEKIT_WS_URL'), token);
 
-            if (await window.getProcessArgs()[0] === "--fake") {
+            if (args[0] === "--fake") {
                 await room.localParticipant.enableCameraAndMicrophone();
             } else {
                 await room.localParticipant.publishTrack(tracks.audio, {
@@ -263,15 +268,11 @@ export async function startStream(): Promise<void> {
             }
         }
 
-        console.log(args)
-        console.log(args[0])
-        console.log(args[0] === "--fake")
-
-        /* if (await window.getProcessArgs()[0] === "--fake") {
+        if (args[0] === "--fake") {
             setTimeout(startSession);
         } else {
             setTimeout(createTracks);
-        } */
+        }
     });
 }
 
