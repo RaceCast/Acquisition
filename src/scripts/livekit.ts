@@ -17,8 +17,8 @@ export async function getToken(): Promise<string> {
     // Generate a new token
     const liveKitSDK: any = await dynamicImport('livekit-server-sdk', module) as typeof import('livekit-server-sdk');
     const accessToken: any = new liveKitSDK.AccessToken(
-        process.env['API_KEY'],
-        process.env['API_SECRET'],
+        process.env['LIVEKIT_KEY'],
+        process.env['LIVEKIT_SECRET'],
         {
             identity: "Car",
             ttl: 60 * 60 * 7,
@@ -31,13 +31,13 @@ export async function getToken(): Promise<string> {
         roomJoin: true,
         roomList: false,
         roomRecord: false,
-        roomAdmin: true,
-        room: process.env['API_ROOM'],
+        roomAdmin: false,
+        room: process.env['LIVEKIT_ROOM'],
         ingressAdmin: false,
         canPublish: true,
         canSubscribe: true,
         canPublishData: true,
-        canUpdateOwnMetadata: false,
+        canUpdateOwnMetadata: true,
         hidden: false,
         recorder: false,
         agent: false
