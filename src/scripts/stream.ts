@@ -145,6 +145,7 @@ export async function startStream(): Promise<void> {
 
     await page.evaluate(async (): Promise<void> => {
         window.setConnected(false);
+        const args = window.getProcessArgs();
         let dataListener = false;
         const tracks = {
             audio: null,
@@ -225,7 +226,7 @@ export async function startStream(): Promise<void> {
 
             await room.connect(await window.getEnvVariable('LIVEKIT_WS_URL'), token);
 
-            if (window.getProcessArgs()[0] === "--fake") {
+            if (args[0] === "--fake") {
                 await room.localParticipant.enableCameraAndMicrophone();
             } else {
                 await room.localParticipant.publishTrack(tracks.audio, {
@@ -261,11 +262,11 @@ export async function startStream(): Promise<void> {
             }
         }
 
-        console.log(window.getProcessArgs())
-        console.log(window.getProcessArgs()[0])
-        console.log(window.getProcessArgs()[0] === "--fake")
+        console.log(args)
+        console.log(args[0])
+        console.log(args[0] === "--fake")
 
-        if (window.getProcessArgs()[0] === "--fake") {
+        if (args[0] === "--fake") {
             setTimeout(startSession);
         } else {
             setTimeout(createTracks);
