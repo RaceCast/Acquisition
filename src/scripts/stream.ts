@@ -40,6 +40,15 @@ function getEnvVariable(name: string): string | undefined {
 }
 
 /**
+ * Get process arguments
+ *
+ * @returns {string[]} Arguments
+ */
+function getProcessArgs(): string[] {
+    return process.argv.slice(2);
+}
+
+/**
  * Show / Send data to the parent process
  *
  * @param {string} message - Message to send
@@ -129,6 +138,7 @@ export async function startStream(): Promise<void> {
     await page.exposeFunction('getToken', getToken);
     await page.exposeFunction('setConnected', value => setConnected(value));
     await page.exposeFunction('getConnected', getConnected);
+    await page.exposeFunction('getProcessArgs', getProcessArgs);
     await page.exposeFunction('getEnvVariable', (name: string): string | undefined => getEnvVariable(name));
     const script: string = fs.readFileSync(`${__dirname}/../libs/livekit-client.min.js`, 'utf8');
     await page.addScriptTag({content: script});
@@ -215,7 +225,7 @@ export async function startStream(): Promise<void> {
 
             await room.connect(await window.getEnvVariable('LIVEKIT_WS_URL'), token);
 
-            if (process.argv.slice(2)[0] === "--fake") {
+            if (window.getProcessArgs[0] === "--fake") {
                 await room.localParticipant.enableCameraAndMicrophone();
             } else {
                 await room.localParticipant.publishTrack(tracks.audio, {
@@ -251,7 +261,7 @@ export async function startStream(): Promise<void> {
             }
         }
 
-        if (process.argv.slice(2)[0] === "--fake") {
+        if (window.getProcessArgs[0] === "--fake") {
             setTimeout(startSession);
         } else {
             setTimeout(createTracks);
