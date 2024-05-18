@@ -97,7 +97,7 @@ export async function getBrowser(): Promise<any> {
 
     // Allow permissions
     const context: any = browser.defaultBrowserContext();
-    await context.overridePermissions("https://live.minarox.fr", ["microphone", "camera"]);
+    await context.overridePermissions(process.env['LIVEKIT_HTTP_URL'], ["microphone", "camera"]);
 
     return browser;
 }
