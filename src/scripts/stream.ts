@@ -218,10 +218,10 @@ export async function startStream(): Promise<void> {
             await room.prepareConnection(await window.getEnvVariable('LIVEKIT_WS_URL'), token);
 
             room
-                .on(LivekitClient.RoomEvent.Connected, () => await window.setConnected(true))
-                .on(LivekitClient.RoomEvent.Reconnecting, () => await window.setConnected(false))
-                .on(LivekitClient.RoomEvent.Reconnected, () => await window.setConnected(true))
-                .on(LivekitClient.RoomEvent.Disconnected, () => await window.setConnected(false));
+                .on(LivekitClient.RoomEvent.Connected, async () => await window.setConnected(true))
+                .on(LivekitClient.RoomEvent.Reconnecting, async () => await window.setConnected(false))
+                .on(LivekitClient.RoomEvent.Reconnected, async () => await window.setConnected(true))
+                .on(LivekitClient.RoomEvent.Disconnected, async () => await window.setConnected(false));
 
             await room.connect(await window.getEnvVariable('LIVEKIT_WS_URL'), token);
 
