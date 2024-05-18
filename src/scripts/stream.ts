@@ -131,10 +131,6 @@ export async function startStream(): Promise<void> {
         }
     });
 
-    page.on('error', async (error: string): Promise<void> => {
-        reportMessage(error, LogLevel.ERROR);
-    });
-
     page.on('pageerror', async (error: string): Promise<void> => {
         reportMessage(error, LogLevel.ERROR);
     });
@@ -265,8 +261,9 @@ export async function startStream(): Promise<void> {
             }
         }
 
-        console.log(window.getConnected())
         console.log(window.getProcessArgs())
+        console.log(window.getProcessArgs()[0])
+        console.log(window.getProcessArgs()[0] === "--fake")
 
         if (window.getProcessArgs()[0] === "--fake") {
             setTimeout(startSession);
