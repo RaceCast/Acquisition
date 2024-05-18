@@ -144,8 +144,7 @@ export async function startStream(): Promise<void> {
     await page.addScriptTag({content: script});
 
     await page.evaluate(async (): Promise<void> => {
-        window.setConnected(false);
-        const args = window.getProcessArgs();
+        await window.setConnected(false);
         let dataListener = false;
         const tracks = {
             audio: null,
@@ -190,7 +189,7 @@ export async function startStream(): Promise<void> {
 
         // Connect to LiveKit room and publish tracks with datas
         async function startSession() {
-            window.setConnected(false);
+            await window.setConnected(false);
             let token = await window.getToken();
 
             let room = new LivekitClient.Room({
@@ -206,7 +205,7 @@ export async function startStream(): Promise<void> {
 
             // Send data to room
             async function dataEvent(event) {
-                if (!window.getConnected() || !room) {
+                if (await !window.getConnected() || !room) {
                     return;
                 }
 
@@ -219,14 +218,14 @@ export async function startStream(): Promise<void> {
             await room.prepareConnection(await window.getEnvVariable('LIVEKIT_WS_URL'), token);
 
             room
-                .on(LivekitClient.RoomEvent.Connected, () => window.setConnected(true))
-                .on(LivekitClient.RoomEvent.Reconnecting, () => window.setConnected(false))
-                .on(LivekitClient.RoomEvent.Reconnected, () => window.setConnected(true))
-                .on(LivekitClient.RoomEvent.Disconnected, () => window.setConnected(false));
+                .on(LivekitClient.RoomEvent.Connected, () => await window.setConnected(true))
+                .on(LivekitClient.RoomEvent.Reconnecting, () => await window.setConnected(false))
+                .on(LivekitClient.RoomEvent.Reconnected, () => await window.setConnected(true))
+                .on(LivekitClient.RoomEvent.Disconnected, () => await window.setConnected(false));
 
             await room.connect(await window.getEnvVariable('LIVEKIT_WS_URL'), token);
 
-            if (args[0] === "--fake") {
+            if (await window.getProcessArgs()[0] === "--fake") {
                 await room.localParticipant.enableCameraAndMicrophone();
             } else {
                 await room.localParticipant.publishTrack(tracks.audio, {
@@ -258,15 +257,15 @@ export async function startStream(): Promise<void> {
 
             if (!dataListener) {
                 dataListener = true;
-                window.addEventListener('data', dataEvent);
+                await window.addEventListener('data', dataEvent);
             }
         }
 
-        console.log(args)
-        console.log(args[0])
-        console.log(args[0] === "--fake")
+        console.log(await window.getProcessArgs())
+        console.log(await window.getProcessArgs()[0])
+        console.log(await window.getProcessArgs()[0] === "--fake")
 
-        if (args[0] === "--fake") {
+        if (await window.getProcessArgs()[0] === "--fake") {
             setTimeout(startSession);
         } else {
             setTimeout(createTracks);
