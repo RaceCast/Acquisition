@@ -146,6 +146,7 @@ export async function startStream(): Promise<void> {
 
     await page.evaluate(async (): Promise<void> => {
         await window.setConnected(false);
+        const args = await window.getProcessArgs()
         let dataListener = false;
         const tracks = {
             audio: null,
@@ -262,9 +263,9 @@ export async function startStream(): Promise<void> {
             }
         }
 
-        console.log(await window.getProcessArgs())
-        console.log(await window.getProcessArgs()[0])
-        console.log(await window.getProcessArgs()[0] === "--fake")
+        console.log(args)
+        console.log(args[0])
+        console.log(args[0] === "--fake")
 
         /* if (await window.getProcessArgs()[0] === "--fake") {
             setTimeout(startSession);
