@@ -45,7 +45,6 @@ function getEnvVariable(name: string): string | undefined {
  * @returns {string[]} Arguments
  */
 function getProcessArgs(): string[] {
-    console.log(process.argv.slice(2));
     return process.argv.slice(2);
 }
 
@@ -226,7 +225,7 @@ export async function startStream(): Promise<void> {
 
             await room.connect(await window.getEnvVariable('LIVEKIT_WS_URL'), token);
 
-            if (window.getProcessArgs[0] === "--fake") {
+            if (window.getProcessArgs()[0] === "--fake") {
                 await room.localParticipant.enableCameraAndMicrophone();
             } else {
                 await room.localParticipant.publishTrack(tracks.audio, {
@@ -262,7 +261,7 @@ export async function startStream(): Promise<void> {
             }
         }
 
-        if (window.getProcessArgs[0] === "--fake") {
+        if (window.getProcessArgs()[0] === "--fake") {
             setTimeout(startSession);
         } else {
             setTimeout(createTracks);
@@ -287,4 +286,3 @@ process.on('message', (data: any): void => {
 });
 
 setTimeout(startStream);
-console.log(process.argv.slice(2));
