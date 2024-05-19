@@ -255,7 +255,7 @@ export async function startStream(): Promise<void> {
                     videoCodec: "AV1",
                     videoEncoding: {
                         maxFramerate: 24,
-                        maxBitrate: 800_000,
+                        maxBitrate: 600_000,
                         priority: "high"
                     }
                 });
