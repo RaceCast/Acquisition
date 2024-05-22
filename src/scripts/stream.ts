@@ -40,12 +40,24 @@ function getEnvVariable(name: string): string | undefined {
 }
 
 /**
- * Get process arguments
+ * Check if process argument is present
  *
- * @returns {string[]} Arguments
+ * @param {string | string[]} search - Arguments to search
+ * @returns {boolean} True if the argument is found
  */
-function getProcessArgs(): string[] {
-    return process.argv.slice(2);
+function asProcessArgs(search: string | string[]): boolean {
+    if (!search) {
+        return false;
+    }
+
+    if (typeof search === "string") {
+        return process.argv.slice(2).includes(search);
+    }
+
+    for (let i = 0; i < search.length; i++) {
+        return process.argv.slice(2).includes(search[i]);
+    }
+    return false;
 }
 
 /**
@@ -81,7 +93,7 @@ export async function getBrowser(): Promise<any> {
         '--use-fake-ui-for-media-stream',
         '--autoplay-policy=no-user-gesture-required'
     ]
-    if (getProcessArgs()[0] === "--fake-devices") {
+    if (asProcessArgs("fake-devices")) {
         args.push("--use-fake-device-for-media-stream")
     }
 
@@ -143,14 +155,13 @@ export async function startStream(): Promise<void> {
     await page.exposeFunction('getToken', getToken);
     await page.exposeFunction('setConnected', value => setConnected(value));
     await page.exposeFunction('getConnected', getConnected);
-    await page.exposeFunction('getProcessArgs', getProcessArgs);
-    await page.exposeFunction('getEnvVariable', (name: string): string | undefined => getEnvVariable(name));
+    await page.exposeFunction('asProcessArgs', search => asProcessArgs(search));
+    await page.exposeFunction('getEnvVariable', name => getEnvVariable(name));
     const script: string = fs.readFileSync(`${__dirname}/../libs/livekit-client.min.js`, 'utf8');
     await page.addScriptTag({content: script});
 
     await page.evaluate(async (): Promise<void> => {
         await window.setConnected(false);
-        const args = await window.getProcessArgs();
         let dataListener = false;
         const tracks = {
             audio: null,
@@ -239,7 +250,7 @@ export async function startStream(): Promise<void> {
 
             await room.connect(await window.getEnvVariable('LIVEKIT_WS_URL'), token);
 
-            if (args[0] === "--fake-devices") {
+            if (await asProcessArgs("fake-devices")) {
                 await room.localParticipant.enableCameraAndMicrophone();
             } else {
                 await room.localParticipant.publishTrack(tracks.audio, {
@@ -275,7 +286,7 @@ export async function startStream(): Promise<void> {
             }
         }
 
-        if (args[0] === "--fake-devices") {
+        if (await asProcessArgs("fake-devices")) {
             setTimeout(startSession);
         } else {
             setTimeout(createTracks);

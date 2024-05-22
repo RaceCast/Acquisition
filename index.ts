@@ -9,12 +9,17 @@ dotenv.config();
 
 // Variables
 const fileType: string = process.env['NODE_ENV'] === 'production' ? 'js' : 'ts';
+const launchArgs: string[] = [];
 let cleanupCalled: boolean = false;
 const processes: Processes = {
     modem: null,
     sensor: null,
     stream: null
 };
+
+if (process.argv.slice(2)[0] === "fake-devices") {
+    launchArgs.push("fake-devices");
+}
 
 /**
  * Launch and listen to sensor script
@@ -23,7 +28,7 @@ const processes: Processes = {
  */
 function launchModem(): void {
     logMessage(`Launching Modem script...`, LogLevel.INFO);
-    processes.modem = fork(`${__dirname}/src/scripts/modem.${fileType}`);
+    processes.modem = fork(`${__dirname}/src/scripts/modem.${fileType}`, launchArgs);
 
     // Fetch data
     processes.modem?.on('message', (data: any): void => {
@@ -50,7 +55,7 @@ function launchModem(): void {
  */
 function launchSensor(): void {
     logMessage(`Launching Sensor script...`, LogLevel.INFO);
-    processes.sensor = fork(`${__dirname}/src/scripts/sensor.${fileType}`);
+    processes.sensor = fork(`${__dirname}/src/scripts/sensor.${fileType}`, launchArgs);
 
     // Fetch data
     processes.sensor?.on('message', (data: any): void => {
@@ -77,8 +82,7 @@ function launchSensor(): void {
  */
 function launchStream(): void {
     logMessage(`Launching Stream script...`, LogLevel.INFO);
-    const fake_arg: any = process.argv.slice(2)[0] === "--fake-devices" ? ["--fake-devices"] : null;
-    processes.stream = fork(`${__dirname}/src/scripts/stream.${fileType}`, fake_arg);
+    processes.stream = fork(`${__dirname}/src/scripts/stream.${fileType}`, launchArgs);
 
     // Fetch data
     processes.stream?.on('message', (data: any): void => {
