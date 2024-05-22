@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import {clearSetup, setup} from "./src/scripts/setup";
 import {logMessage} from "./src/utils";
-import {LogLevel, Processes} from "./src/types/global";
+import {LogLevel, Processes, asProcessArg} from "./src/types/global";
 import {fork} from 'child_process';
 
 // Load environment variables from .env file
@@ -17,7 +17,7 @@ const processes: Processes = {
     stream: null
 };
 
-if (process.argv.slice(2)[0] === "fake-devices") {
+if (asProcessArg("fake-devices")) {
     launchArgs.push("fake-devices");
 }
 

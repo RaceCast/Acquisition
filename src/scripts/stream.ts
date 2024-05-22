@@ -2,7 +2,7 @@
 import puppeteer from 'puppeteer-core';
 import fs from 'fs';
 import {logMessage} from '../utils';
-import {LogLevel} from '../types/global';
+import {LogLevel, asProcessArg} from '../types/global';
 import {getToken} from "./livekit";
 
 // Variables
@@ -40,27 +40,6 @@ function getEnvVariable(name: string): string | undefined {
 }
 
 /**
- * Check if process argument is present
- *
- * @param {string | string[]} search - Arguments to search
- * @returns {boolean} True if the argument is found
- */
-function asProcessArgs(search: string | string[]): boolean {
-    if (!search) {
-        return false;
-    }
-
-    if (typeof search === "string") {
-        return process.argv.slice(2).includes(search);
-    }
-
-    for (let i = 0; i < search.length; i++) {
-        return process.argv.slice(2).includes(search[i]);
-    }
-    return false;
-}
-
-/**
  * Show / Send data to the parent process
  *
  * @param {string} message - Message to send
@@ -93,7 +72,7 @@ export async function getBrowser(): Promise<any> {
         '--use-fake-ui-for-media-stream',
         '--autoplay-policy=no-user-gesture-required'
     ]
-    if (asProcessArgs("fake-devices")) {
+    if (asProcessArg("fake-devices")) {
         args.push("--use-fake-device-for-media-stream")
     }
 
@@ -155,7 +134,7 @@ export async function startStream(): Promise<void> {
     await page.exposeFunction('getToken', getToken);
     await page.exposeFunction('setConnected', value => setConnected(value));
     await page.exposeFunction('getConnected', getConnected);
-    await page.exposeFunction('asProcessArgs', search => asProcessArgs(search));
+    await page.exposeFunction('asArg', argument => asProcessArg(argument));
     await page.exposeFunction('getEnvVariable', name => getEnvVariable(name));
     const script: string = fs.readFileSync(`${__dirname}/../libs/livekit-client.min.js`, 'utf8');
     await page.addScriptTag({content: script});
@@ -250,7 +229,7 @@ export async function startStream(): Promise<void> {
 
             await room.connect(await window.getEnvVariable('LIVEKIT_WS_URL'), token);
 
-            if (await asProcessArgs("fake-devices")) {
+            if (await asArg("fake-devices")) {
                 await room.localParticipant.enableCameraAndMicrophone();
             } else {
                 await room.localParticipant.publishTrack(tracks.audio, {
@@ -286,7 +265,7 @@ export async function startStream(): Promise<void> {
             }
         }
 
-        if (await asProcessArgs("fake-devices")) {
+        if (await asArg("fake-devices")) {
             setTimeout(startSession);
         } else {
             setTimeout(createTracks);
