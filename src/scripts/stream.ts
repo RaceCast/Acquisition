@@ -81,7 +81,7 @@ export async function getBrowser(): Promise<any> {
         '--use-fake-ui-for-media-stream',
         '--autoplay-policy=no-user-gesture-required'
     ]
-    if (getProcessArgs()[0] === "--fake") {
+    if (getProcessArgs()[0] === "--fake-devices") {
         args.push("--use-fake-device-for-media-stream")
     }
 
@@ -239,7 +239,7 @@ export async function startStream(): Promise<void> {
 
             await room.connect(await window.getEnvVariable('LIVEKIT_WS_URL'), token);
 
-            if (args[0] === "--fake") {
+            if (args[0] === "--fake-devices") {
                 await room.localParticipant.enableCameraAndMicrophone();
             } else {
                 await room.localParticipant.publishTrack(tracks.audio, {
@@ -275,7 +275,7 @@ export async function startStream(): Promise<void> {
             }
         }
 
-        if (args[0] === "--fake") {
+        if (args[0] === "--fake-devices") {
             setTimeout(startSession);
         } else {
             setTimeout(createTracks);
