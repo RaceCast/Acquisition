@@ -150,7 +150,7 @@ export async function startStream(): Promise<void> {
 
     await page.evaluate(async (): Promise<void> => {
         await window.setConnected(false);
-        const args = await window.getProcessArgs()
+        const args = await window.getProcessArgs();
         let dataListener = false;
         const tracks = {
             audio: null,
@@ -181,7 +181,15 @@ export async function startStream(): Promise<void> {
                 if (deviceId) {
                     tracks.video = await LivekitClient.createLocalVideoTrack({
                         deviceId: deviceId,
-                        resolution: LivekitClient.VideoPresets.h1080.resolution
+                        resolution: {
+                            height: 360,
+                            width: 640,
+                            encoding: {
+                                maxBitrate: 450_000,
+                                maxFramerate: 24,
+                                priority: "high",
+                            }
+                        }
                     })
                 }
             }
@@ -255,7 +263,7 @@ export async function startStream(): Promise<void> {
                     videoCodec: "AV1",
                     videoEncoding: {
                         maxFramerate: 24,
-                        maxBitrate: 600_000,
+                        maxBitrate: 450_000,
                         priority: "high"
                     }
                 });
