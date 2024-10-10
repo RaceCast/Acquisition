@@ -1,8 +1,8 @@
 // @ts-nocheck
-import puppeteer from 'puppeteer-core';
 import fs from 'fs';
-import {logMessage, getEnvVariable, asProcessArg, getToken, updateRoomMetadata} from '../utils';
-import {LogLevel} from '../types';
+import puppeteer from 'puppeteer-core';
+import { LogLevel } from '../types';
+import { asProcessArg, getEnvVariable, getToken, logMessage, updateRoomMetadata } from '../utils';
 
 // Variables
 let browser: any = null;
@@ -40,7 +40,10 @@ export async function newPage(): Promise<any> {
         '--no-sandbox',
         '--enable-gpu',
         '--use-fake-ui-for-media-stream',
-        '--autoplay-policy=no-user-gesture-required'
+        '--autoplay-policy=no-user-gesture-required',
+        '--use-gl=angle',
+        '--use-angle=gl',
+        '--enable-unsafe-webgpu'
     ]
     if (asProcessArg('fake-devices')) {
         args.push('--use-fake-device-for-media-stream')
@@ -132,11 +135,12 @@ export async function startBroadcast(): Promise<void> {
                             {
                                 ...publishTrackOptions,
                                 source: LivekitClient.Track.Source.Camera,
-                                //degradationPreference: 'maintain-framerate',
+                                degradationPreference: 'maintain-framerate',
+                                videoCodec: 'AV1',
                                 videoEncoding: {
-                                    maxFramerate: 25,
-                                    maxBitrate: device.label.startsWith("Cam Link 4K") ? 400_000 : 100_000,
-                                    priority: device.label.startsWith("Cam Link 4K") ? "low" : "very-low"
+                                    maxFramerate: 30,
+                                    maxBitrate: device.label.startsWith("Cam Link 4K") ? 500_000 : 120_000,
+                                    priority: device.label.startsWith("Cam Link 4K") ? "high" : "low"
                                 }
                             }
                         );
