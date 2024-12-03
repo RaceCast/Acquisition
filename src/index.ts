@@ -1,7 +1,8 @@
-import puppeteer, { Page } from "puppeteer";
+import puppeteer from "puppeteer-core";
 
 (async () => {
     const browser = await puppeteer.launch({
+        executablePath: "/usr/bin/chromium",
         headless: true,
         ignoreDefaultArgs: true,
         args:  [
@@ -24,7 +25,7 @@ import puppeteer, { Page } from "puppeteer";
             '--ignore-gpu-blocklist'
         ]
     });
-    const page: Page = await browser.newPage();
+    const page = await browser.newPage();
 
     page.on('pageerror', error => {
       console.log(error.message);

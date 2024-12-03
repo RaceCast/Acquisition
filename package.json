@@ -33,6 +33,6 @@
   },
   "dependencies": {
     "livekit-server-sdk": "^2.9.2",
-    "puppeteer": "^23.9.0"
+    "puppeteer-core": "^23.9.0"
   }
 }
