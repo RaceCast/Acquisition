@@ -20,7 +20,7 @@
   "module": "src/index.js",
   "type": "module",
   "scripts": {
-    "dev": "bun src/index.ts",
+    "dev": "bun --watch src/index.ts",
     "build": "bun build --minify --entrypoints src/index.ts --outdir build --target bun",
     "start": "bun run build/index.js",
     "test": "bun test"
@@ -32,6 +32,7 @@
     "typescript": "^5.7.2"
   },
   "dependencies": {
-    "livekit-server-sdk": "^2.9.2"
+    "livekit-server-sdk": "^2.9.2",
+    "puppeteer": "^23.9.0"
   }
 }
