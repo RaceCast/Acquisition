@@ -52,10 +52,10 @@ Javascript app for acquiring and transmitting data and media stream from the var
 
 ### Tech Stack
 
+- [Bun](https://bun.sh/)
 - [TypeScript](https://www.typescriptlang.org/)
 - [LiveKit](https://github.com/livekit/server-sdk-js)
 - [Puppeteer](https://pptr.dev/)
-- [Dotenv](https://github.com/motdotla/dotenv)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -64,12 +64,14 @@ Javascript app for acquiring and transmitting data and media stream from the var
 ### Prerequisites
 
 This project is highly hardware / software dependant and as not been tested on other component expect mine :
+
 - Raspberry Pi 5 (with Ubuntu 22.04 and ModemManager deactivated)
 - Quectel EC25 Modem (preconfigured in ECM mode, with an "Orange" SIM card)
 - GoPro Hero 12 Black
 - Elgato CamLink 4K
 
 The current user need to be added to the "dialout" group to allow communication with the modem's serial ports without `sudo` :
+
 ```bash
 sudo gpasswd -a username dialout
 ```
@@ -77,30 +79,36 @@ sudo gpasswd -a username dialout
 ### Deploy on embedded system
 
 1. Clone the project and install dependencies :
+
 ```bash
-git clone https://github.com/RaceCast/Emitter
-cd Emitter
-npm i
+git clone https://github.com/Minarox/RaceCast-Emitter
+cd RaceCast-Emitter
+bun install
 ```
 
 2. Create `.env` file at the root of the project with these variables:
+
 ```dotenv
-LIVEKIT_WS_URL="wss://example.com"
-LIVEKIT_HTTP_URL="https://example.com"
+LIVEKIT_TLS="true"
+LIVEKIT_DOMAIN="example.com"
 LIVEKIT_KEY="key"
 LIVEKIT_SECRET="secret"
 LIVEKIT_ROOM="room"
+LIVEKIT_IDENTITY="car"
 ```
 
 3. Build TypeScript files :
+
 ```bash
-npm run build
+bun run build
 ```
 
 4. Run the app :
+
 ```bash
-npm start
+bun run start
 ```
+
 The app automaticaly setting up environment and start needed scripts.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
