@@ -1,4 +1,5 @@
 import type { getLiveKitToken } from "./src/libs/livekit";
+import type { getEnv } from "./src/main";
 
 declare module "bun" {
     interface Env {
@@ -13,6 +14,7 @@ declare module "bun" {
 
 declare global {
     interface Window {
-        getLiveKitToken: typeof getLiveKitToken
+        getLiveKitToken: typeof getLiveKitToken;
+        getEnv: typeof getEnv;
     }
 }

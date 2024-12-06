@@ -17,12 +17,12 @@
     "type": "git",
     "url": "https://github.com/Minarox/RaceCast-Emitter.git"
   },
-  "module": "src/index.js",
+  "module": "src/main.js",
   "type": "module",
   "scripts": {
-    "dev": "bun --watch src/index.ts",
-    "build": "bun build --minify --entrypoints src/index.ts --outdir build --target bun",
-    "start": "bun run build/index.js",
+    "dev": "bun --watch src/main.ts",
+    "build": "bun build --minify --entrypoints src/main.ts --outdir build --target bun",
+    "start": "bun run build/main.js",
     "test": "bun test"
   },
   "devDependencies": {
