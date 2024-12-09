@@ -8,18 +8,33 @@ const HTTP_URL = `http${TLS ? 's' : ''}://${process.env.LIVEKIT_DOMAIN}`;
 const MODEM_ID = await $`mmcli -L | grep 'QUECTEL' | sed -n 's#.*/Modem/\([0-9]\+\).*#\1#p' | tr -d '\n'`.text();
 
 export function getEnv(name: string): string {
-    const value = process.env[name] || '';
-    return value;
+    return process.env[name] || '';
 }
 
 export async function getModemInfo(): Promise<any> {
-    const datas = await $`mmcli -m ${MODEM_ID} -J`.json();
-    if (datas) {
-        return {
-            tech: datas.modem.generic['access-technologies'],
-            signal: datas.modem.generic['signal-quality'].value
+    const global = await $`mmcli -m ${MODEM_ID} -J`.json();
+    const location = await $`sudo mmcli -m ${MODEM_ID} --location-get -J`.json();
+    let datas = {};
+
+    if (global) {
+        datas = {
+            ...datas,
+            tech: global.modem?.generic['access-technologies'],
+            signal: Number(global.modem?.generic['signal-quality']?.value)
         }
     }
+
+    if (location) {
+        datas = {
+            ...datas,
+            longitude: Number(location.modem?.location?.gps?.longitude?.replace(',', '.')),
+            latitude: Number(location.modem?.location?.gps?.latitude?.replace(',', '.')),
+            altitude: Number(location.modem?.location?.gps?.altitude?.replace(',', '.')),
+            speed: Number(location.modem?.location?.gps?.nmea[5].split(',')[7])
+        }
+    }
+
+    return datas;
 }
 
 (async () => {
