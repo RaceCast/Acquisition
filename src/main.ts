@@ -1,18 +1,30 @@
+import { $ } from "bun";
 import fs from 'fs';
 import puppeteer, { Browser, BrowserContext, Page } from "puppeteer-core";
 import { getLiveKitToken } from './libs/livekit';
 
 const TLS = process.env.LIVEKIT_TLS === 'true';
 const HTTP_URL = `http${TLS ? 's' : ''}://${process.env.LIVEKIT_DOMAIN}`;
+const MODEM_ID = await $`mmcli -L | grep 'QUECTEL' | sed -n 's#.*/Modem/\([0-9]\+\).*#\1#p' | tr -d '\n'`.text();
 
 export function getEnv(name: string): string {
     const value = process.env[name] || '';
     return value;
 }
 
+export async function getModemInfo(): Promise<any> {
+    const datas = await $`mmcli -m ${MODEM_ID} -J`.json();
+    if (datas) {
+        return {
+            tech: datas.modem.generic['access-technologies'],
+            signal: datas.modem.generic['signal-quality'].value
+        }
+    }
+}
+
 (async () => {
     const browser: Browser = await puppeteer.launch({
-        executablePath: "/usr/bin/google-chrome",
+        executablePath: "/usr/bin/chromium",
         headless: true,
         ignoreDefaultArgs: true,
         args:  [
