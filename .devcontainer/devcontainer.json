@@ -3,7 +3,7 @@
     "build": {
         "dockerfile": "Dockerfile",
         "args": {
-            "VERSION": "latest"
+            "VERSION": "1.1.39"
         }
     },
     "remoteUser": "bun",
