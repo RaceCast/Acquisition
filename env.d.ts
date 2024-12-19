@@ -10,6 +10,7 @@ declare module "bun" {
         LIVEKIT_SECRET: string;
         LIVEKIT_ROOM: string;
         LIVEKIT_IDENTITY: string;
+        LOG_LEVEL: 'verbose' | 'debug' | 'info' | 'warn' | 'error';
     }
 }
 

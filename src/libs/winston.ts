@@ -18,8 +18,8 @@ const fileFormat = format.printf(({ level, message }): string => {
 })
 
 export const logger = createLogger({
-    level: "debug",
-    silent: process.env['NODE_ENV'] === "test",
+    level: process.env.LOG_LEVEL || "info",
+    silent: process.env.NODE_ENV === "test",
     transports: [
         new transports.Console({
             format: consoleFormat
@@ -32,7 +32,6 @@ export const logger = createLogger({
             maxsize: 1048576,
             maxFiles: 4,
             zippedArchive: true
-
         }),
         new transports.File({
             level: "error",

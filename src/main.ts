@@ -77,6 +77,7 @@ logger.info('Starting browser...');
 
 (async () => {
     browser = await puppeteer.launch({
+        dumpio: process.env.LOG_LEVEL === 'debug',
         executablePath: "/usr/bin/chromium",
         headless: true,
         ignoreDefaultArgs: true,
