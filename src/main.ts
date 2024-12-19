@@ -87,7 +87,7 @@ logger.info('Starting browser...');
 
     logger.info(`Loading ${HTTP_URL}...`);
     await page.goto(HTTP_URL);
-    await page.addScriptTag({ content: fs.readFileSync(`${__dirname}/libs/livekit-client.min.js`, 'utf8') });
+    await page.addScriptTag({ content: fs.readFileSync(`${__dirname}/libs/livekit-client.umd.min.js`, 'utf8') });
     await page.exposeFunction('getLiveKitToken', getLiveKitToken);
     await page.exposeFunction('getEnv', getEnv);
     await page.exposeFunction('logInfo', (message: string) => { logger.info(message) });
