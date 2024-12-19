@@ -8,7 +8,29 @@ import { logger } from './libs/winston';
 const TLS = process.env.LIVEKIT_TLS === 'true';
 const HTTP_URL = `http${TLS ? 's' : ''}://${process.env.LIVEKIT_DOMAIN}`;
 const MODEM_ID = await $`mmcli -L | grep 'QUECTEL' | sed -n 's#.*/Modem/\([0-9]\+\).*#\1#p' | tr -d '\n'`.text();
-let oldModemInfo = {};
+let oldModemInfo: any = {};
+let browser: Browser | null = null;
+let cleanUpCalled: boolean = false;
+
+async function cleanUp(): Promise<void> {
+    if (cleanUpCalled) {
+        return
+    }
+    cleanUpCalled = true;
+
+    if (browser) {
+        logger.verbose("Closing browser...");
+        await browser.close();
+    }
+
+    logger.verbose("Exit...");
+    process.exit();
+}
+
+["exit", "SIGINT", "SIGUSR1", "SIGUSR2", "uncaughtException"]
+    .forEach((type: string): void => {
+        process.on(type, cleanUp);
+    });
 
 export function getEnv(name: string): string {
     return process.env[name] || '';
@@ -54,7 +76,7 @@ logger.debug("------------------");
 logger.info('Starting browser...');
 
 (async () => {
-    const browser: Browser = await puppeteer.launch({
+    browser = await puppeteer.launch({
         executablePath: "/usr/bin/chromium",
         headless: true,
         ignoreDefaultArgs: true,
@@ -149,6 +171,4 @@ logger.info('Starting browser...');
 
         await room.connect(WS_URL, TOKEN);
     });
-
-    await browser.close();
 })();
