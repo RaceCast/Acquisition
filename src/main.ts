@@ -1,7 +1,9 @@
 import { $ } from "bun";
+import colors from "colors";
 import fs from 'fs';
 import puppeteer, { Browser, BrowserContext, Page } from "puppeteer-core";
 import { getLiveKitToken } from './libs/livekit';
+import { logger } from './libs/winston';
 
 const TLS = process.env.LIVEKIT_TLS === 'true';
 const HTTP_URL = `http${TLS ? 's' : ''}://${process.env.LIVEKIT_DOMAIN}`;
@@ -13,6 +15,8 @@ export function getEnv(name: string): string {
 }
 
 export async function getModemInfo(): Promise<any> {
+    logger.debug("Get modem info...");
+
     const global = await $`mmcli -m ${MODEM_ID} -J`.json();
     const location = await $`sudo mmcli -m ${MODEM_ID} --location-get -J`.json();
     let modemInfo = {};
@@ -37,9 +41,17 @@ export async function getModemInfo(): Promise<any> {
 
     if (JSON.stringify(oldModemInfo) !== JSON.stringify(modemInfo)) {
         oldModemInfo = modemInfo;
+        logger.verbose("Update modem info");
+        logger.debug(`New modem info: ${JSON.stringify(modemInfo)}`);
         return modemInfo;
     }
 }
+
+logger.debug(`TLS: ${TLS ? colors.green('enabled') : colors.red('disabled')}`);
+logger.debug(`Domain: ${process.env.LIVEKIT_DOMAIN}`);
+logger.debug(`Modem ID: ${MODEM_ID}`);
+logger.debug("------------------");
+logger.info('Starting browser...');
 
 (async () => {
     const browser: Browser = await puppeteer.launch({
@@ -69,12 +81,16 @@ export async function getModemInfo(): Promise<any> {
     });
     const context: BrowserContext = browser.defaultBrowserContext();
     await context.overridePermissions(HTTP_URL, ['microphone', 'camera']);
+
+    logger.info('Opening new page...');
     const page: Page = await browser.newPage();
 
+    logger.info(`Loading ${HTTP_URL}...`);
     await page.goto(HTTP_URL);
     await page.addScriptTag({ content: fs.readFileSync(`${__dirname}/libs/livekit-client.min.js`, 'utf8') });
     await page.exposeFunction('getLiveKitToken', getLiveKitToken);
     await page.exposeFunction('getEnv', getEnv);
+    await page.exposeFunction('logInfo', (message: string) => { logger.info(message) });
 
     page.on('pageerror', error => {
         console.log(error.message);
@@ -92,9 +108,7 @@ export async function getModemInfo(): Promise<any> {
     });
 
     await page.evaluate(async (): Promise<void> => {
-        const TLS = await window.getEnv('LIVEKIT_TLS') === 'true';
-        const WS_URL = `ws${TLS ? 's' : ''}://${await window.getEnv('LIVEKIT_DOMAIN')}`;
-        const TOKEN = await window.getLiveKitToken();
+        await window.logInfo("Starting LiveKit...");
 
         // @ts-ignore
         const room = new LivekitClient.Room({
