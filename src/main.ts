@@ -83,6 +83,7 @@ logger.info('Starting browser...');
         ignoreDefaultArgs: true,
         args:  [
             '--no-sandbox',
+            '--disable-setuid-sandbox',
             '--headless=new',
             '--use-angle=vulkan',
             '--enable-gpu-rasterization',
@@ -133,6 +134,10 @@ logger.info('Starting browser...');
     await page.evaluate(async (): Promise<void> => {
         await window.logInfo("Starting LiveKit...");
 
+        const TLS = await window.getEnv('LIVEKIT_TLS') === 'true';
+        const WS_URL = `ws${TLS ? 's' : ''}://${await window.getEnv('LIVEKIT_DOMAIN')}`;
+        const TOKEN = await window.getLiveKitToken();
+
         // @ts-ignore
         const room = new LivekitClient.Room({
             reconnectPolicy: {
@@ -146,30 +151,31 @@ logger.info('Starting browser...');
 
         room
             // @ts-ignore
-            .on(LivekitClient.RoomEvent.Connected, () => {
-                console.log('Connected');
+            .on(LivekitClient.RoomEvent.Connected, async () => {
+                await window.logInfo("Connected");
             })
             // @ts-ignore
-            .on(LivekitClient.RoomEvent.Reconnecting, () => {
-                console.log('Reconnecting...');
+            .on(LivekitClient.RoomEvent.Reconnecting, async () => {
+                await window.logInfo("Reconnecting...");
             })
             // @ts-ignore
-            .on(LivekitClient.RoomEvent.Reconnected, () => {
-                console.log('Reconnected');
+            .on(LivekitClient.RoomEvent.Reconnected, async () => {
+                await window.logInfo("Reconnected");
             })
             // @ts-ignore
-            .on(LivekitClient.RoomEvent.Disconnected, () => {
-                console.log('Disconnected.');
+            .on(LivekitClient.RoomEvent.Disconnected, async () => {
+                await window.logInfo("Disconnected");
             })
             // @ts-ignore
-            .on(LivekitClient.RoomEvent.MediaDevicesChanged, () => {
-                console.log('Media devices changed');
+            .on(LivekitClient.RoomEvent.MediaDevicesChanged, async () => {
+                await window.logInfo("Media devices changed");
             })
             // @ts-ignore
-            .on(LivekitClient.RoomEvent.MediaDevicesError, () => {
-                console.log('Media devices error');
+            .on(LivekitClient.RoomEvent.MediaDevicesError, async () => {
+                await window.logInfo("Media devices error");
             });
 
+        await window.logInfo("Connecting to LiveKit...");
         await room.connect(WS_URL, TOKEN);
     });
 })();
