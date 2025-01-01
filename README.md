@@ -94,7 +94,6 @@ LIVEKIT_DOMAIN="example.com"
 LIVEKIT_KEY="key"
 LIVEKIT_SECRET="secret"
 LIVEKIT_ROOM="room"
-LIVEKIT_IDENTITY="car"
 ```
 
 3. Build TypeScript files :

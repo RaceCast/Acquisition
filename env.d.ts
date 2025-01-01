@@ -9,7 +9,6 @@ declare module "bun" {
         LIVEKIT_KEY: string;
         LIVEKIT_SECRET: string;
         LIVEKIT_ROOM: string;
-        LIVEKIT_IDENTITY: string;
         LOG_LEVEL: 'verbose' | 'debug' | 'info' | 'warn' | 'error';
     }
 }
@@ -18,6 +17,8 @@ declare global {
     interface Window {
         getLiveKitToken: typeof getLiveKitToken;
         getEnv: typeof getEnv;
+        logWarn: typeof logger.warn;
         logInfo: typeof logger.info;
+        logDebug: typeof logger.debug;
     }
 }

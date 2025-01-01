@@ -1,12 +1,12 @@
+// @ts-nocheck
+
 import { $ } from "bun";
 import colors from "colors";
 import fs from 'fs';
 import puppeteer, { Browser, BrowserContext, Page } from "puppeteer-core";
-import { getLiveKitToken } from './libs/livekit';
+import { HTTP_URL, TLS, getLiveKitToken, updateRoomMetadata } from './libs/livekit';
 import { logger } from './libs/winston';
 
-const TLS = process.env.LIVEKIT_TLS === 'true';
-const HTTP_URL = `http${TLS ? 's' : ''}://${process.env.LIVEKIT_DOMAIN}`;
 const MODEM_ID = await $`mmcli -L | grep 'QUECTEL' | sed -n 's#.*/Modem/\([0-9]\+\).*#\1#p' | tr -d '\n'`.text();
 let oldModemInfo: any = {};
 let browser: Browser | null = null;
@@ -36,7 +36,7 @@ export function getEnv(name: string): string {
     return process.env[name] || '';
 }
 
-export async function getModemInfo(): Promise<any> {
+async function updateEmitterInfo(): Promise<void> {
     logger.debug("Get modem info...");
 
     const global = await $`mmcli -m ${MODEM_ID} -J`.json();
@@ -65,13 +65,17 @@ export async function getModemInfo(): Promise<any> {
         oldModemInfo = modemInfo;
         logger.verbose("Update modem info");
         logger.debug(`New modem info: ${JSON.stringify(modemInfo)}`);
-        return modemInfo;
+        await updateRoomMetadata(modemInfo);
     }
 }
 
 logger.debug(`TLS: ${TLS ? colors.green('enabled') : colors.red('disabled')}`);
 logger.debug(`Domain: ${process.env.LIVEKIT_DOMAIN}`);
 logger.debug(`Modem ID: ${MODEM_ID}`);
+
+await $`mmcli -m ${MODEM_ID} --location-enable-gps-raw --location-enable-gps-nmea`.quiet();
+setInterval(async () => await updateEmitterInfo, 1000);
+
 logger.debug("------------------");
 logger.info('Starting browser...');
 
@@ -96,7 +100,6 @@ logger.info('Starting browser...');
             '--no-first-run',
             '--disable-features=Translate',
             '--no-default-browser-check',
-            '--window-size=1280,720',
             '--allow-chrome-scheme-url',
             '--use-fake-ui-for-media-stream',
             '--autoplay-policy=no-user-gesture-required',
@@ -114,20 +117,22 @@ logger.info('Starting browser...');
     await page.addScriptTag({ content: fs.readFileSync(`${__dirname}/libs/livekit-client.umd.min.js`, 'utf8') });
     await page.exposeFunction('getLiveKitToken', getLiveKitToken);
     await page.exposeFunction('getEnv', getEnv);
+    await page.exposeFunction('logWarn', (message: string) => { logger.warn(message) });
     await page.exposeFunction('logInfo', (message: string) => { logger.info(message) });
+    await page.exposeFunction('logDebug', (message: string) => { logger.debug(message) });
 
     page.on('pageerror', error => {
-        console.log(error.message);
+        logger.error(error.message);
     });
 
     page.on('requestfailed', request => {
-        console.log(`Request Failed: ${request.failure()?.errorText}, ${request.url()}`);
+        logger.error(`Request Failed: ${request.failure()?.errorText}, ${request.url()}`);
     });
 
     page.on('console', async (msg: any): Promise<void> => {
         const msgArgs = msg.args();
         for (let i = 0; i < msgArgs.length; ++i) {
-            console.log(await msgArgs[i].jsonValue());
+            logger.debug(JSON.stringify(await msgArgs[i].jsonValue()));
         }
     });
 
@@ -137,8 +142,8 @@ logger.info('Starting browser...');
         const TLS = await window.getEnv('LIVEKIT_TLS') === 'true';
         const WS_URL = `ws${TLS ? 's' : ''}://${await window.getEnv('LIVEKIT_DOMAIN')}`;
         const TOKEN = await window.getLiveKitToken();
+        let devicesBuffer = [];
 
-        // @ts-ignore
         const room = new LivekitClient.Room({
             reconnectPolicy: {
                 nextRetryDelayInMs: () => {
@@ -147,35 +152,112 @@ logger.info('Starting browser...');
             }
         });
 
+        await window.logInfo("Connecting to LiveKit server...");
         await room.prepareConnection(WS_URL, TOKEN);
 
+        // Create and publish tracks
+        const createTracks = async (devices = []) => {
+            devices.forEach(async (device) => {
+                const publishTrackOptions = {
+                    name: device.label,
+                    stream: device.groupId,
+                    simulcast: false
+                }
+
+                if (device.kind === "videoinput") {
+                    await window.logDebug(`Add video track: ${device.label}`);
+                    await room.localParticipant.publishTrack(
+                        await LivekitClient.createLocalVideoTrack({
+                            deviceId: device.deviceId
+                        }),
+                        {
+                            ...publishTrackOptions,
+                            source: LivekitClient.Track.Source.Camera,
+                            degradationPreference: "maintain-resolution",
+                            videoCodec: "AV1",
+                            /* videoEncoding: {
+                                maxFramerate: 30,
+                                maxBitrate: 2_500_000,
+                            } */
+                        }
+                    );
+                } else if (device.kind === "audioinput") {
+                    await window.logDebug(`Add audio track: ${device.label}`);
+                    await room.localParticipant.publishTrack(
+                        await LivekitClient.createLocalAudioTrack({
+                            deviceId: device.deviceId,
+                            autoGainControl: false,
+                            echoCancellation: false,
+                            noiseSuppression: false
+                        }),
+                        {
+                            ...publishTrackOptions,
+                            source: LivekitClient.Track.Source.Microphone,
+                            red: true,
+                            dtx: true,
+                            stopMicTrackOnMute: false,
+                            /* audioPreset: {
+                                maxBitrate: 36_000
+                            } */
+                        }
+                    );
+                }
+            });
+        }
+
+        // Unpublish and remove tracks
+        const removeTracks = async (devices = []) => {
+            devices.forEach(async (device) => {
+                const trackPublication = room.localParticipant.getTrackPublicationByName(device.label);
+                if (trackPublication?.track) {
+                    await window.logDebug("Remove track: ", device.label);
+                    await room.localParticipant.unpublishTrack(trackPublication.track);
+                }
+            });
+        }
+
+        const checkTracks = async () => {
+            const devices = (await navigator.mediaDevices.enumerateDevices())
+                .filter(device =>
+                    ['audioinput', 'videoinput'].includes(device.kind) &&
+                    !["Default", "HD USB Camera  HD USB Camera", "Cam Link 4K  Cam Link 4K"].includes(device.label)
+                );
+
+            const addedDevices = devices.filter(currentDevice =>
+                !devicesBuffer.some(previousDevice => previousDevice.deviceId === currentDevice.deviceId)
+            );
+            const removedDevices = devicesBuffer.filter(previousDevice =>
+                !devices.some(currentDevice => currentDevice.deviceId === previousDevice.deviceId)
+            );
+
+            await removeTracks(removedDevices);
+            await createTracks(addedDevices);
+            devicesBuffer = devices;
+        }
+
         room
-            // @ts-ignore
             .on(LivekitClient.RoomEvent.Connected, async () => {
                 await window.logInfo("Connected");
             })
-            // @ts-ignore
             .on(LivekitClient.RoomEvent.Reconnecting, async () => {
-                await window.logInfo("Reconnecting...");
+                await window.logWarn("Reconnecting...");
             })
-            // @ts-ignore
             .on(LivekitClient.RoomEvent.Reconnected, async () => {
                 await window.logInfo("Reconnected");
             })
-            // @ts-ignore
             .on(LivekitClient.RoomEvent.Disconnected, async () => {
-                await window.logInfo("Disconnected");
+                await window.logWarn("Disconnected");
             })
-            // @ts-ignore
             .on(LivekitClient.RoomEvent.MediaDevicesChanged, async () => {
-                await window.logInfo("Media devices changed");
+                await window.logDebug("Media devices changed");
+                await checkTracks();
             })
-            // @ts-ignore
             .on(LivekitClient.RoomEvent.MediaDevicesError, async () => {
-                await window.logInfo("Media devices error");
+                await window.logDebug("Media devices error");
+                await checkTracks();
             });
 
-        await window.logInfo("Connecting to LiveKit...");
         await room.connect(WS_URL, TOKEN);
+        await checkTracks();
     });
 })();

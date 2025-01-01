@@ -1,5 +1,8 @@
 import * as LiveKit from 'livekit-server-sdk';
 
+export const TLS = process.env.LIVEKIT_TLS === 'true';
+export const HTTP_URL = `http${TLS ? 's' : ''}://${process.env.LIVEKIT_DOMAIN}`;
+
 let token: string;
 let tokenCreatedAt: number;
 
@@ -13,7 +16,7 @@ export async function getLiveKitToken(): Promise<string> {
         process.env['LIVEKIT_KEY'],
         process.env['LIVEKIT_SECRET'],
         {
-            identity: "Car",
+            identity: "car",
             ttl: 60 * 60 * 7,
         },
     );
@@ -40,4 +43,30 @@ export async function getLiveKitToken(): Promise<string> {
     tokenCreatedAt = Date.now();
 
     return token;
+}
+
+export async function updateRoomMetadata(metadata: any): Promise<void> {
+    // Create a new RoomService
+    const roomService: LiveKit.RoomServiceClient = new LiveKit.RoomServiceClient(
+        HTTP_URL,
+        process.env['LIVEKIT_KEY'],
+        process.env['LIVEKIT_SECRET']
+    );
+
+    // Fetch room
+    const room: any = (await roomService.listRooms())
+        .find((room: any): boolean => room.name === process.env['LIVEKIT_ROOM']);
+    const roomMetadata = room.metadata ? JSON.parse(room.metadata) : {};
+
+    // Update room metadata
+    await roomService.updateRoomMetadata(
+        process.env['LIVEKIT_ROOM'],
+        JSON.stringify({
+            ...roomMetadata,
+            car: {
+                ...metadata,
+                last_update: Date.now()
+            }
+        })
+    );
 }
