@@ -26,14 +26,14 @@
     "test": "bun test"
   },
   "devDependencies": {
-    "@types/bun": "^1.1.14"
+    "@types/bun": "^1.1.16"
   },
   "peerDependencies": {
     "typescript": "^5.7.2"
   },
   "dependencies": {
     "colors": "^1.4.0",
-    "livekit-server-sdk": "^2.9.4",
+    "livekit-server-sdk": "^2.9.7",
     "puppeteer-core": "^23.11.1",
     "winston": "^3.17.0"
   }
