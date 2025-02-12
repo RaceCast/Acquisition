@@ -22,8 +22,7 @@
   "scripts": {
     "dev": "bun src/main.ts",
     "build": "bun build --minify --entrypoints src/main.ts --outdir build --target bun",
-    "start": "bun run build/main.js",
-    "test": "bun test"
+    "start": "bun run build/main.js"
   },
   "devDependencies": {
     "@types/bun": "^1.2.2"
@@ -33,7 +32,9 @@
   },
   "dependencies": {
     "colors": "^1.4.0",
-    "livekit-server-sdk": "^2.9.7",
+    "i2c-bus": "^5.2.3",
+    "i2c-mpu6050": "^2.3.0",
+    "livekit-server-sdk": "^2.10.0",
     "puppeteer-core": "^23.11.1",
     "winston": "^3.17.0"
   }

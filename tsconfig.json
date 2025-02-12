@@ -33,5 +33,6 @@
     "allowUnusedLabels": false,
     "allowUnreachableCode": false,
     "strictFunctionTypes": true
-  }
+  },
+  "include": ["src"]
 }
