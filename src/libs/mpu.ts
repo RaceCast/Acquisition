@@ -51,13 +51,13 @@ function readData(): void {
   delete data.gyro.z;
 
   // Offset calibration
-  data.accel.x -= 0.058978759765625;
-  data.accel.y -= 0.0088987060546875;
-  data.accel.z -= 0.059643090820312494;
-  data.gyro.x -= -0.7022061068702323;
-  data.gyro.y -= 1.0760305343511471;
-  data.rotation.x -= -0.4804232806148877;
-  data.rotation.y -= -3.1856752923673435;
+  data.accel.x -= 0.1062666015625;
+  data.accel.y -= -0.02471844970703125;
+  data.accel.z -= 0.0587399194335938;
+  data.gyro.x -= -1.164820763358796;
+  data.gyro.y -= 0.7862737404580179;
+  data.rotation.x -= 1.3307699238968285;
+  data.rotation.y -= -5.730089298597652;
 
   // Transform data
   limitDecimals(data);
