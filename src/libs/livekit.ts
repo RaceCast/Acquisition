@@ -8,7 +8,7 @@ let token: string;
 let tokenCreatedAt: number;
 
 export async function getLiveKitToken(): Promise<string> {
-    if (token && tokenCreatedAt && (Date.now() - tokenCreatedAt) < 60 * 60 * 6 * 1000) {
+    if (token && tokenCreatedAt && (Date.now() - tokenCreatedAt) < 60 * 60 * 12 * 1000) {
         return token;
     }
 
