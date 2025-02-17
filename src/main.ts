@@ -36,35 +36,27 @@ export function getEnv(name: string): string {
     return process.env[name] || '';
 }
 
+function parseNumber(value: unknown): number | null {
+    const result = Number(value ?? undefined)
+    return isNaN(result) ? null : result
+}
+
 async function updateEmitterInfo(): Promise<void> {
     logger.debug("Get modem info...");
 
-    const global = await $`mmcli -m ${MODEM_ID} -J`.json();
-    const location = await $`mmcli -m ${MODEM_ID} --location-get -J`.json();
-    let modemInfo = {};
+    const global = (await $`mmcli -m ${MODEM_ID} -J`.json())?.modem?.generic;
+    const location = (await $`mmcli -m ${MODEM_ID} --location-get -J`.json())?.modem?.location?.gps;
+    const modemInfo = {
+        tech: global?.['access-technologies'],
+        signal: parseNumber(global?.['signal-quality']?.value),
+        longitude: parseNumber(location?.longitude?.replace(',', '.')),
+        latitude: parseNumber(location?.latitude?.replace(',', '.')),
+        altitude: parseNumber(location?.altitude?.replace(',', '.')),
+        speed: parseNumber(location?.nmea?.find((nmea: string) => nmea?.startsWith('$GPVTG'))?.split(',')?.[7] || null)
+    };
 
-    if (global) {
-        const datas: any = global.modem?.generic
-        modemInfo = {
-            ...modemInfo,
-            tech: datas?.['access-technologies'] ?? [],
-            signal: Number(datas?.['signal-quality']?.value ?? -1)
-        }
-    }
-
-    if (location) {
-        const datas: any = location.modem?.location?.gps
-        modemInfo = {
-            ...modemInfo,
-            longitude: Number(datas?.longitude?.replace(',', '.')),
-            latitude: Number(datas?.latitude?.replace(',', '.')),
-            altitude: Number(datas?.altitude?.replace(',', '.')),
-            speed: Number(datas?.nmea?.find((nmea: string) => nmea?.startsWith('$GPVTG'))?.split(',')?.[7])
-        }
-    }
-
-    if (JSON.stringify(oldModemInfo) !== JSON.stringify(modemInfo)) {
-        oldModemInfo = modemInfo;
+    if (oldModemInfo !== JSON.stringify(modemInfo)) {
+        oldModemInfo = JSON.stringify(modemInfo);
         logger.verbose("Update modem info");
         logger.debug(`New modem info: ${JSON.stringify(modemInfo)}`);
         await updateRoomMetadata(modemInfo);
