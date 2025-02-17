@@ -40,24 +40,26 @@ async function updateEmitterInfo(): Promise<void> {
     logger.debug("Get modem info...");
 
     const global = await $`mmcli -m ${MODEM_ID} -J`.json();
-    const location = await $`sudo mmcli -m ${MODEM_ID} --location-get -J`.json();
+    const location = await $`mmcli -m ${MODEM_ID} --location-get -J`.json();
     let modemInfo = {};
 
     if (global) {
+        const datas: any = global.modem?.generic
         modemInfo = {
             ...modemInfo,
-            tech: global.modem?.generic['access-technologies'],
-            signal: Number(global.modem?.generic['signal-quality']?.value)
+            tech: datas?.['access-technologies'] ?? [],
+            signal: Number(datas?.['signal-quality']?.value ?? -1)
         }
     }
 
     if (location) {
+        const datas: any = location.modem?.location?.gps
         modemInfo = {
             ...modemInfo,
-            longitude: Number(location.modem?.location?.gps?.longitude?.replace(',', '.')),
-            latitude: Number(location.modem?.location?.gps?.latitude?.replace(',', '.')),
-            altitude: Number(location.modem?.location?.gps?.altitude?.replace(',', '.')),
-            speed: Number(location.modem?.location?.gps?.nmea?.find((nmea) => nmea.startsWith('$GPVTG'))?.split(',')?.[7])
+            longitude: Number(datas?.longitude?.replace(',', '.')),
+            latitude: Number(datas?.latitude?.replace(',', '.')),
+            altitude: Number(datas?.altitude?.replace(',', '.')),
+            speed: Number(datas?.nmea?.find((nmea: string) => nmea?.startsWith('$GPVTG'))?.split(',')?.[7])
         }
     }
 
@@ -73,6 +75,7 @@ logger.debug(`TLS: ${TLS ? colors.green('enabled') : colors.red('disabled')}`);
 logger.debug(`Domain: ${process.env['LIVEKIT_DOMAIN']}`);
 logger.debug(`Modem ID: ${MODEM_ID}`);
 
+logger.debug('Enable GPS location...')
 await $`mmcli -m ${MODEM_ID} --enable --location-enable-gps-raw --location-enable-gps-nmea`.quiet();
 setInterval(async () => await updateEmitterInfo(), 1000);
 
