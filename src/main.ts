@@ -71,6 +71,8 @@ async function updateEmitterInfo(): Promise<void> {
     }
 }
 
+// ---------------------------------------------------
+
 logger.debug(`TLS: ${TLS ? colors.green('enabled') : colors.red('disabled')}`);
 logger.debug(`Domain: ${process.env['LIVEKIT_DOMAIN']}`);
 logger.debug(`Modem ID: ${MODEM_ID}`);
@@ -176,7 +178,7 @@ logger.info('Starting browser...');
                         {
                             ...publishTrackOptions,
                             source: LivekitClient.Track.Source.Camera,
-                            degradationPreference: "maintain-resolution",
+                            degradationPreference: "maintain-framerate",
                             videoCodec: "AV1",
                             /* videoEncoding: {
                                 maxFramerate: 30,
@@ -196,7 +198,7 @@ logger.info('Starting browser...');
                         {
                             ...publishTrackOptions,
                             source: LivekitClient.Track.Source.Microphone,
-                            red: true,
+                            red: false,
                             dtx: true,
                             stopMicTrackOnMute: false,
                             /* audioPreset: {
