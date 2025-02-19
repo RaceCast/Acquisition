@@ -7,7 +7,7 @@
         "colors": "^1.4.0",
         "i2c-bus": "^5.2.3",
         "i2c-mpu6050": "^2.3.0",
-        "livekit-server-sdk": "^2.10.0",
+        "livekit-server-sdk": "^2.10.1",
         "puppeteer-core": "^23.11.1",
         "winston": "^3.17.0",
       },
