@@ -4,10 +4,10 @@ import { execSync } from "child_process";
 import colors from "colors";
 import fs from 'fs';
 import puppeteer, { Browser, BrowserContext, Page } from "puppeteer-core";
-import { HTTP_URL, TLS, getLiveKitToken, updateRoomMetadata } from './libs/livekit';
-import { logger } from './libs/winston';
+import { HTTP_URL, TLS, getLiveKitToken, updateRoomMetadata } from './libs/livekit.ts';
+import { logger } from './libs/winston.ts';
 
-const MODEM_ID: number = parseNumber(execSync(`mmcli -L | grep 'QUECTEL' | sed -n 's#.*/Modem/\([0-9]\+\).*#\x01#p' | tr -d '\n'`));
+const MODEM_ID: number = Number(execSync(`mmcli -L | grep 'QUECTEL' | sed -n 's#.*/Modem/\([0-9]\+\).*#\x01#p' | tr -d '\n'`));
 let oldModemInfo: any = {};
 let browser: Browser | null = null;
 let cleanUpCalled: boolean = false;
@@ -44,8 +44,8 @@ function parseNumber(value: unknown): number | null {
 async function updateEmitterInfo(): Promise<void> {
     logger.debug("Get modem info...");
 
-    const global = JSON.parse(execSync(`mmcli -m ${MODEM_ID} -J`) || '{}')?.modem?.generic;
-    const location = JSON.parse(execSync(`mmcli -m ${MODEM_ID} --location-get -J`) || '{}')?.modem?.location?.gps;
+    const global = JSON.parse(execSync(`sudo mmcli -m ${MODEM_ID} -J`).toString() || '{}')?.modem?.generic;
+    const location = JSON.parse(execSync(`sudo mmcli -m ${MODEM_ID} --location-get -J`).toString() || '{}')?.modem?.location?.gps;
     const modemInfo = {
         tech: global?.['access-technologies'],
         signal: parseNumber(global?.['signal-quality']?.value),
@@ -69,9 +69,13 @@ logger.debug(`TLS: ${TLS ? colors.green('enabled') : colors.red('disabled')}`);
 logger.debug(`Domain: ${process.env['LIVEKIT_DOMAIN']}`);
 logger.debug(`Modem ID: ${MODEM_ID}`);
 
-logger.debug('Enable GPS location...')
-execSync(`mmcli -m ${MODEM_ID} --enable --location-enable-gps-raw --location-enable-gps-nmea`);
-setInterval(async () => await updateEmitterInfo(), 1000);
+try {
+    logger.debug('Enable GPS location...');
+    execSync(`sudo mmcli -m ${MODEM_ID} --enable --location-enable-gps-raw --location-enable-gps-nmea`);
+    setInterval(async () => await updateEmitterInfo(), 1000);
+} catch (error: any) {
+    logger.error(error);
+}
 
 logger.debug("------------------");
 logger.info('Starting browser...');

@@ -1,23 +1,22 @@
 {
     "name": "RaceCast",
-    "image": "ghcr.io/marcosgomesneto/bun-devcontainers/basic-bun:0.0.6",
+    "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
     "features": {
         "ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
             "packages": "gnupg2"
         }
     },
-    "remoteUser": "bun",
+    "remoteUser": "node",
     "runArgs": [
         "--name",
         "racecast_devcontainer"
     ],
-    "postStartCommand": "bun install",
+    "postStartCommand": "npm install",
     "customizations": {
         "vscode": {
             "extensions": [
                 "github.vscode-github-actions",
                 "vivaxy.vscode-conventional-commits",
-                "mk12.better-git-line-blame",
                 "dbaeumer.vscode-eslint",
                 "usernamehw.errorlens",
                 "esbenp.prettier-vscode",

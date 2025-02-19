@@ -1,6 +1,6 @@
-import type { getLiveKitToken } from "./libs/livekit";
-import type { logger } from "./libs/winston";
-import type { getEnv } from "./main";
+import type { getLiveKitToken } from "./libs/livekit.ts";
+import type { logger } from "./libs/winston.ts";
+import type { getEnv } from "./main.ts";
 
 declare module "bun" {
     interface Env {

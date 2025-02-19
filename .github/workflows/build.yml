@@ -3,6 +3,9 @@ name: Building project
 on:
     pull_request
 
+permissions:
+    contents: read
+
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
     cancel-in-progress: true
@@ -16,13 +19,23 @@ jobs:
             - name: Checkout project
               uses: actions/checkout@v4
 
-            - name: Setup Bun
-              uses: oven-sh/setup-bun@v2
+            - name: Setup Node
+              uses: actions/setup-node@v4
               with:
-                bun-version: latest
+                node-version: 20
+                cache: npm
 
             - name: Install dependencies
-              run: bun install
+              run: npm ci
+
+    check:
+        name: Check
+        needs: dependencies
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Check types
+              run: npm run check
 
     build:
         name: Build
@@ -31,4 +44,4 @@ jobs:
 
         steps:
             - name: Build project
-              run: bun run build
+              run: npm run build

@@ -1,9 +1,9 @@
-import i2c from "i2c-bus";
+import i2c, { type I2CBus } from "i2c-bus";
 import Mpu6050 from "i2c-mpu6050";
 
 // Define global variables
 const address: number = 0x68;
-const bus: number = i2c.openSync(1);
+const bus: I2CBus = i2c.openSync(1);
 const mpu6050: Mpu6050 = new Mpu6050(bus, address);
 const temperatures: number[] = [];
 let oldTemperature: string = '';

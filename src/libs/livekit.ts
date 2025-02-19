@@ -1,5 +1,5 @@
 import * as LiveKit from 'livekit-server-sdk';
-import { logger } from './winston';
+import { logger } from './winston.ts';
 
 export const TLS = process.env['LIVEKIT_TLS'] === 'true';
 export const HTTP_URL = `http${TLS ? 's' : ''}://${process.env['LIVEKIT_DOMAIN']}`;

@@ -17,20 +17,20 @@
     "type": "git",
     "url": "https://github.com/Minarox/RaceCast-Emitter.git"
   },
-  "module": "src/main.js",
+  "module": "src/main.ts",
   "type": "module",
   "scripts": {
     "dev": "bun src/main.ts",
-    "build": "bun build --minify --entrypoints src/main.ts --outdir build --target bun",
-    "start": "bun run build/main.js"
+    "check": "tsc",
+    "build": "bun build --minify --entrypoints src/main.ts --outdir build --target bun --entry-naming racecast.js",
+    "start": "bun run build/racecast.js"
   },
   "devDependencies": {
-    "@types/bun": "^1.2.2"
-  },
-  "peerDependencies": {
-    "typescript": "^5.7.3"
+    "@types/bun": "^1.2.2",
+    "@types/i2c-bus": "^5.1.2"
   },
   "dependencies": {
+    "typescript": "^5.7.3",
     "colors": "^1.4.0",
     "i2c-bus": "^5.2.3",
     "i2c-mpu6050": "^2.3.0",
