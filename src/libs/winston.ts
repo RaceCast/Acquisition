@@ -4,7 +4,7 @@ import { config, createLogger, format, transports } from "winston";
 const consoleFormat = format.printf(({ level, message }): any => {
     const color: string = config.npm.colors[level] as string;
     const bgColor: string = `bg${color.slice(0, 1).toUpperCase()}${color.slice(1)}`;
-    const status: string = colors.bold(colors[bgColor](` ${level.toUpperCase()} `));
+    const status: string = colors.bold((colors as any)[bgColor](` ${level.toUpperCase()} `));
 
     return `[${new Date().toLocaleString('fr-FR', { timeZone: 'UTC' })}] ${status} ${message}`;
 });

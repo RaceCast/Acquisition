@@ -1,5 +1,6 @@
-import i2c, { type I2CBus } from "i2c-bus";
+// @ts-ignore
 import Mpu6050 from "i2c-mpu6050";
+import i2c, { type I2CBus } from "i2c-bus";
 
 // Define global variables
 const address: number = 0x68;
