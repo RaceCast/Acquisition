@@ -23,11 +23,12 @@
     "dev": "node src/main.ts",
     "check": "tsc",
     "build": "bun build --minify --entrypoints src/main.ts --outdir build --target bun --entry-naming racecast.js",
-    "start": "bun run build/racecast.js"
+    "start": "nodemon --cwd build --delay 5 racecast.js"
   },
   "devDependencies": {
     "@types/bun": "^1.2.2",
-    "@types/i2c-bus": "^5.1.2"
+    "@types/i2c-bus": "^5.1.2",
+    "nodemon": "^3.1.9"
   },
   "dependencies": {
     "colors": "^1.4.0",

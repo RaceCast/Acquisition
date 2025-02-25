@@ -36,7 +36,7 @@ async function cleanUp(error: any): Promise<void> {
     process.exit();
 }
 
-["exit", "SIGINT", "SIGQUIT", "SIGTERM", "SIGUSR1", "SIGUSR2", "uncaughtException"]
+["exit", "SIGINT", "SIGQUIT", "SIGTERM", "SIGUSR1", "SIGUSR2", "uncaughtException", "SIGUSR2"]
     .forEach((type: string): void => {
         process.on(type, cleanUp);
     });
