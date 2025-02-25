@@ -1,6 +1,5 @@
 // @ts-nocheck
 
-import "dotenv/config";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { execSync } from "child_process";
@@ -11,8 +10,8 @@ import { HTTP_URL, TLS, getLiveKitToken, updateRoomMetadata } from './libs/livek
 import { logger } from './libs/winston.ts';
 
 const MODEM_ID: number = Number(execSync(`mmcli -L | grep 'QUECTEL' | sed -n 's#.*/Modem/\([0-9]\+\).*#\x01#p' | tr -d '\n'`));
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __filename: string = fileURLToPath(import.meta.url);
+const __dirname: string = dirname(__filename);
 let oldModemInfo: any = {};
 let browser: Browser | null = null;
 let cleanUpCalled: boolean = false;
