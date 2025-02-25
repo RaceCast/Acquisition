@@ -1,6 +1,8 @@
 // @ts-nocheck
 
 import "dotenv/config";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 import { execSync } from "child_process";
 import colors from "colors";
 import fs from 'fs';
@@ -9,15 +11,21 @@ import { HTTP_URL, TLS, getLiveKitToken, updateRoomMetadata } from './libs/livek
 import { logger } from './libs/winston.ts';
 
 const MODEM_ID: number = Number(execSync(`mmcli -L | grep 'QUECTEL' | sed -n 's#.*/Modem/\([0-9]\+\).*#\x01#p' | tr -d '\n'`));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 let oldModemInfo: any = {};
 let browser: Browser | null = null;
 let cleanUpCalled: boolean = false;
 
-async function cleanUp(): Promise<void> {
+async function cleanUp(error: any): Promise<void> {
     if (cleanUpCalled) {
         return
     }
     cleanUpCalled = true;
+
+    if (error?.toString()?.split(':')?.[0]?.includes('Error')) {
+        logger.error(error.toString());
+    }
 
     if (browser) {
         logger.verbose("Closing browser...");
@@ -28,7 +36,7 @@ async function cleanUp(): Promise<void> {
     process.exit();
 }
 
-["exit", "SIGINT", "SIGUSR1", "SIGUSR2", "uncaughtException"]
+["exit", "SIGINT", "SIGQUIT", "SIGTERM", "SIGUSR1", "SIGUSR2", "uncaughtException"]
     .forEach((type: string): void => {
         process.on(type, cleanUp);
     });
